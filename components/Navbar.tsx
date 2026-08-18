@@ -104,6 +104,7 @@ export default function Navbar() {
   const appLinks = [
     { href: '/checkout', label: './checkout-router.sh', desc: 'Stripe for Multi-Chain Crypto' },
     { href: '/payroll', label: './crypto-payroll.sh', desc: 'Corporate Batch Disbursal Engine' },
+    { href: '/escrow', label: './freelancer-escrow.sh', desc: 'Milestone Fund Locking & Release' },
     { href: '/credit-score', label: './credit-score.sh', desc: 'Wallet Reputation & DeFi Rating' },
     { href: '/merchant', label: './merchant-portal.sh', desc: 'Embeddable Payment Widget Code' },
     { href: '/sdk-docs', label: './api-sandbox.sh', desc: 'Live REST API Testing Sandbox' },
