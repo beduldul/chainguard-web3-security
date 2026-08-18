@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChainGuard Guardian</title>
+  <style>
+    body {
+      width: 320px;
+      margin: 0;
+      padding: 16px;
+      background-color: #07090e;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    .title {
+      font-weight: 800;
+      font-size: 14px;
+      color: #00f2fe;
+    }
+    .badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .card {
+      background: rgba(18, 24, 36, 0.8);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 6px;
+      color: #94a3b8;
+    }
+    .stat-val {
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      border: none;
+      color: #000;
+      font-weight: 800;
+      font-size: 12px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="title">🛡️ ChainGuard Firewall</span>
+    <span class="badge">ACTIVE</span>
+  </div>
+
+  <div class="card">
+    <div class="stat">
+      <span>Interceptor Status:</span>
+      <span class="stat-val" style="color:#10b981">HOOKED</span>
+    </div>
+    <div class="stat">
+      <span>Scams Blocked:</span>
+      <span class="stat-val">12</span>
+    </div>
+    <div class="stat">
+      <span>Target Network:</span>
+      <span class="stat-val">Base Mainnet</span>
+    </div>
+  </div>
+
+  <button className="btn" id="openDashboard">Open Security Dashboard</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>
