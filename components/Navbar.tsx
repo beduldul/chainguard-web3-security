@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Shield, ShieldAlert, ShieldCheck, Wallet, ChevronDown, Terminal, Globe, Smartphone, CheckCircle2 } from 'lucide-react';
+import { Shield, ShieldAlert, ShieldCheck, Wallet, ChevronDown, Terminal, Globe, Smartphone, CreditCard, ShoppingBag } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -51,7 +51,8 @@ export default function Navbar() {
   const navLinks = [
     { href: '/', label: 'Tx Guardian', icon: ShieldCheck },
     { href: '/wallet-exposure', label: 'Wallet Exposure', icon: ShieldAlert },
-    { href: '/website-scanner', label: 'dApp Scanner', icon: Globe },
+    { href: '/checkout', label: 'Universal Checkout', icon: CreditCard },
+    { href: '/merchant', label: 'Merchant Portal', icon: ShoppingBag },
     { href: '/extension-demo', label: 'Extension Demo', icon: Smartphone },
     { href: '/sdk-docs', label: 'Developer SDK', icon: Terminal },
   ];
@@ -88,7 +89,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                     isActive
                       ? 'bg-gradient-to-r from-cyan-500/20 to-blue-600/20 text-cyan-300 border border-cyan-500/30 shadow-[0_0_10px_rgba(0,242,254,0.15)]'
                       : 'text-gray-400 hover:text-white hover:bg-white/[0.05]'
