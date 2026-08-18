@@ -1,126 +1,69 @@
-# 🛡️ ChainGuard — Onchain Transaction Guardian
+# 🛡️ ChainGuard — Web3 Security & Multi-Product Startup Suite
 
-> **The Next-Generation Web3 Transaction Firewall & Calldata Security Layer.**  
-> *Intersects, simulates, and audits EVM transactions before wallet signatures.*
-
----
-
-## 🌟 Overview
-
-**ChainGuard** is a full-stack Web3 security platform that acts as an **onchain antivirus and firewall**. Before a user signs an EVM transaction in MetaMask, Rabby, or Coinbase Wallet, ChainGuard intercepts the raw calldata, simulates token balance diffs, checks contract source verification, flags unlimited approval risks, and provides human-readable AI explanations.
+> **The Next-Generation Web3 Security Layer, Transaction Firewall & Decentralized Commerce Infrastructure.**  
+> *Intercepts, simulates, and audits EVM & Solana transactions before wallet signatures.*
 
 ---
 
-## 🏗️ Architecture Overview
+## 🌟 Ecosystem Overview
+
+**ChainGuard** is an all-in-one Web3 security & decentralized financial platform. It features an onchain transaction firewall, Chrome Manifest V3 interceptor, cross-chain checkout engine, corporate crypto payroll, onchain credit scoring, freelancer escrow, and autonomous AI drainer bot hunter.
+
+---
+
+## 🔥 6 Web3 Startup Platforms Included
+
+1. 🥇 **ChainGuard Firewall** (`/` & `/wallet-exposure` & `/website-scanner`)
+   - Decodes EVM calldata (`approve`, `transfer`, `permit`, `multicall`), traces token state diffs, calculates dynamic 0-100 risk scores, scans token approvals, and audits dApp domains.
+2. 🥈 **Universal Crypto Checkout (Stripe for Web3)** (`/checkout` & `/merchant`)
+   - Multi-chain payment router across Solana (Phantom), Base (USDC/ETH), Arbitrum (USDT), and Ethereum. Includes embeddable React payment widget generator.
+3. 🥉 **Corporate Crypto Payroll Infrastructure** (`/payroll`)
+   - 1-transaction batch salary disbursal engine, employee roster manager, and automated CSV tax reporting.
+4. 4️⃣ **Onchain Credit Score & Identity** (`/credit-score`)
+   - Wallet creditworthiness scoring engine (0-100) based on onchain longevity, transaction count, loan repayments, zero liquidations, and average USD balances. Unlocks 30% collateral discounts in DeFi lending.
+5. 5️⃣ **Onchain Freelancer Escrow Protocol** (`/escrow`)
+   - Milestone-based escrow contract locking client funds and releasing payouts to freelancer wallets upon milestone verification.
+6. 🤖 **Autonomous AI Security Agent & Drainer Bot Hunter** (`/ai-agent`)
+   - Autonomous mempool & bytecode scanner detecting fake airdrop drainers, phishing signatures, and honeypot mint calls 24/7. Auto-pushes threats to the global blacklist registry.
+
+---
+
+## 📁 Smart Contracts & Test Suite
 
 ```
-                          ┌──────────────────────────┐
-                          │       dApp / Web3        │
-                          │   Requests Signature     │
-                          └────────────┬─────────────┘
-                                       │ Intercept
-                                       ▼
-                          ┌──────────────────────────┐
-                          │   ChainGuard Firewall    │
-                          │  Extension / Middleware  │
-                          └────────────┬─────────────┘
-                                       │
-              ┌────────────────────────┴────────────────────────┐
-              ▼                                                 ▼
-  ┌───────────────────────┐                         ┌───────────────────────┐
-  │   Calldata Decoder    │                         │  Contract Risk Audit  │
-  │  (ERC20, ERC721, EIP) │                         │ (Age, Proxy, Admin)   │
-  └───────────┬───────────┘                         └───────────┬───────────┘
-              │                                                 │
-              └────────────────────────┬────────────────────────┘
-                                       ▼
-                          ┌──────────────────────────┐
-                          │    Risk Scoring Engine   │
-                          │      (Score: 0-100)      │
-                          └────────────┬─────────────┘
-                                       │
-                                       ▼
-                          ┌──────────────────────────┐
-                          │   AI Explainer (EN/ID)   │
-                          │    Human Safety Warning  │
-                          └────────────┬─────────────┘
-                                       │
-              ┌────────────────────────┴────────────────────────┐
-              ▼                                                 ▼
-  🔴 CRITICAL (Score >= 75)                         🟢 SAFE / APPROVED
-  [ REJECT TRANSACTION ]                             [ PROCEED TO SIGN ]
+contracts/
+├── ChainGuardRegistry.sol         # Onchain Security Risk Attestation Registry
+├── UniversalCheckout.sol          # Multi-Token Escrow & Merchant Payout Settlement
+├── CryptoPayroll.sol              # 1-Tx Batch Salary Disbursal Contract
+├── OnchainCreditScore.sol         # Verifiable Onchain Credit Credential Registry
+├── FreelancerEscrow.sol           # Milestone Fund Locking & Client Release Contract
+├── AIAgentRegistry.sol            # Autonomous Threat Telemetry & Blacklist Registry
+└── test/
+    ├── ChainGuardRegistry.t.sol   # Foundry Unit Test for Registry
+    ├── UniversalCheckout.t.sol    # Foundry Unit Test for Merchant Checkout
+    ├── CryptoPayroll.t.sol        # Foundry Unit Test for Batch Payroll
+    └── OnchainCreditScore.t.sol   # Foundry Unit Test for Credit Score Credentials
 ```
 
 ---
 
-## 🔥 Key Feature Modules
+## ⚡ Quick Start & Verification Commands
 
-1. **Transaction Firewall & Calldata Decoder** (`app/page.tsx` & `lib/txDecoder.ts`)
-   - Decodes EVM function signatures (`approve`, `transfer`, `permit`, `setApprovalForAll`, `multicall`, `execute`).
-   - Flags **Unlimited Token Approvals** (`2^256-1`) and calculates potential at-risk asset exposure.
-2. **Pre-Execution State Simulation** (`lib/simulator.ts`)
-   - Pre-traces token output/input deltas, gas fees in ETH & USD, and before/after wallet balances.
-3. **Deterministic 0-100 Risk Score Engine** (`lib/riskEngine.ts`)
-   - Weighted threat factors (+30 unlimited approval, +20 unverified source code, +15 age < 7 days, +20 proxy with unknown admin, +25 blacklisted address).
-4. **Wallet Exposure & Revoke Manager** (`app/wallet-exposure/page.tsx`)
-   - Scans active token approvals across USDT, USDC, WETH, DAI, and NFTs. Provides 1-click gasless simulation revokes.
-5. **dApp Website & Domain Scanner** (`app/website-scanner/page.tsx`)
-   - Audits domain age, SSL certificate, frontend scripts, and Etherscan blocklist reports.
-6. **Manifest V3 Chrome Extension Package** (`extension/`)
-   - Injected Web3 Provider content script hooking into `window.ethereum.request` before MetaMask popups appear.
-7. **Solidity Smart Contract Security Registry** (`contracts/`)
-   - Onchain registry for recording blacklisted contracts, security attestations, and risk reports on testnets/mainnet.
-8. **Developer Security SDK & API Hub** (`app/sdk-docs/page.tsx` & `app/api/analyze-tx/route.ts`)
-   - TypeScript `@chainguard/sdk` code generator and interactive live REST API testing bench.
-
----
-
-## 📁 Repository Structure
-
-```
-web3/
-├── app/                        # Next.js 14 App Router Pages & API Routes
-│   ├── page.tsx                # Main Transaction Guardian & Test Vector Studio
-│   ├── wallet-exposure/        # Active Approvals Scan & Revoke Manager
-│   ├── website-scanner/        # dApp URL / Domain Security Scanner
-│   ├── extension-demo/         # Interactive Extension Interceptor Playground
-│   ├── sdk-docs/               # Developer Security SDK & Live API Bench
-│   └── api/                    # REST API Endpoints (/api/analyze-tx, /api/scan-domain)
-├── components/                 # Reusable UI Cards, Badges, Risk Gauges, Navbar & Footer
-├── lib/                        # Core Technical Engines
-│   ├── txDecoder.ts            # EVM Calldata Parser & Function Selector Decoder
-│   ├── riskEngine.ts           # Deterministic Risk Scoring Algorithm
-│   ├── simulator.ts            # State Diff & Token Movement Simulator
-│   ├── domainScanner.ts        # Website Domain & SSL Auditor
-│   ├── aiExplainer.ts          # Natural Language AI Summary Engine (EN/ID)
-│   ├── mockData.ts             # Test Vector Presets & Mock Exposure Datasets
-│   └── types.ts                # TypeScript Interfaces & Provenance Declarations
-├── extension/                  # Chrome / Brave Browser Extension Source (Manifest V3)
-│   ├── manifest.json
-│   ├── contentScript.js
-│   ├── background.js
-│   ├── popup.html
-│   └── popup.js
-├── contracts/                  # Solidity Smart Contracts & Foundry Unit Tests
-│   ├── ChainGuardRegistry.sol
-│   └── test/ChainGuardRegistry.t.sol
-└── package.json
-```
-
----
-
-## ⚡ Quick Start
-
-### 1. Install Dependencies & Run Development Server
-```bash
-npm install
-npm run dev
-```
-Open **[http://localhost:3000](http://localhost:3000)** in your browser.
-
-### 2. Build for Production
+### 1. Run Production Server
 ```bash
 npm run build
+npm run start
+```
+App runs live at **[http://localhost:3000](http://localhost:3000)**.
+
+### 2. Run Automated API Integration Tests
+```bash
+node scripts/test-all-apis.mjs
+```
+
+### 3. Run Solidity Contract Verifier Audit
+```bash
+node scripts/test-solidity-contracts.mjs
 ```
 
 ---
@@ -129,24 +72,9 @@ npm run build
 
 1. Open Google Chrome / Brave and navigate to `chrome://extensions`.
 2. Enable **Developer mode** in the top right.
-3. Click **Load unpacked** and select the `extension/` directory in this workspace.
+3. Click **Load unpacked** and select the `extension/` directory.
 
 ---
 
-## 📄 REST API Endpoint
-
-### `POST /api/analyze-tx`
-**Request Body**:
-```json
-{
-  "to": "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-  "calldata": "0x095ea7b30000000000000000000000008192fa000000000000000000000000000092faffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-  "valueEth": "0",
-  "chainId": 8453
-}
-```
-
----
-
-## 📜 License & Security Disclosure
-Built for Web3 Security, Trust, and User Safety. Distributed under the MIT License.
+## 📜 License & Open Source
+Distributed under the MIT License. Published on GitHub at **[beduldul/chainguard-web3-security](https://github.com/beduldul/chainguard-web3-security)**.
