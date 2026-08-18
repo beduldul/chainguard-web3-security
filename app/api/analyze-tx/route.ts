@@ -5,6 +5,18 @@ import { simulateTransaction } from '@/lib/simulator';
 import { generateAiExplanation } from '@/lib/aiExplainer';
 import { ContractSecurityReport } from '@/lib/types';
 
+// Handle OPTIONS preflight requests for Chrome Extensions
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -12,7 +24,13 @@ export async function POST(req: NextRequest) {
 
     // Validate inputs
     if (to && !to.startsWith('0x')) {
-      return NextResponse.json({ success: false, error: 'Invalid contract address format. Must start with 0x.' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'Invalid contract address format. Must start with 0x.' },
+        {
+          status: 400,
+          headers: { 'Access-Control-Allow-Origin': '*' },
+        }
+      );
     }
 
     const decoded = decodeCalldata(to, calldata, valueEth, chainId, isPreset);
@@ -53,17 +71,25 @@ export async function POST(req: NextRequest) {
 
     const aiExplanation = generateAiExplanation(fullReport, locale);
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        ...fullReport,
-        aiExplanation,
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          ...fullReport,
+          aiExplanation,
+        },
       },
-    });
+      {
+        headers: { 'Access-Control-Allow-Origin': '*' },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message || 'Failed to analyze transaction' },
-      { status: 400 }
+      {
+        status: 400,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+      }
     );
   }
 }
