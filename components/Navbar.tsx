@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Terminal, Shield, Wallet, ChevronDown, Cpu, Lock, Bot, RefreshCw } from 'lucide-react';
+import { Terminal, Shield, Wallet, ChevronDown, Cpu, Lock, Bot, RefreshCw, GitPullRequest } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -105,6 +105,7 @@ export default function Navbar() {
   const appLinks = [
     { href: '/checkout', label: './checkout-router.sh', desc: 'Stripe for Multi-Chain Crypto' },
     { href: '/subscriptions', label: './recurring-billing.sh', desc: 'Automated Crypto Subscriptions' },
+    { href: '/bounties', label: './github-bounty.sh', desc: 'Open-Source Issue Bounty Pool' },
     { href: '/payroll', label: './crypto-payroll.sh', desc: 'Corporate Batch Disbursal Engine' },
     { href: '/escrow', label: './freelancer-escrow.sh', desc: 'Milestone Fund Locking & Release' },
     { href: '/credit-score', label: './credit-score.sh', desc: 'Wallet Reputation & DeFi Rating' },
@@ -203,14 +204,14 @@ export default function Navbar() {
             </div>
 
             <Link
-              href="/subscriptions"
+              href="/bounties"
               className={`px-3 py-1 border ${
-                pathname === '/subscriptions'
-                  ? 'bg-[#ffb000] text-black font-bold border-[#ffb000]'
-                  : 'bg-black text-gray-300 border-gray-700 hover:border-[#ffb000] hover:text-[#ffb000]'
+                pathname === '/bounties'
+                  ? 'bg-[#00ff66] text-black font-bold border-[#00ff66]'
+                  : 'bg-black text-gray-300 border-gray-700 hover:border-[#00ff66] hover:text-[#00ff66]'
               }`}
             >
-              ./billing.sh
+              ./bounties.sh
             </Link>
 
           </nav>
