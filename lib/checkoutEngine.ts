@@ -1,7 +1,7 @@
 export interface PaymentRoute {
   id: string;
   sourceChain: string;
-  sourceChainId: number;
+  sourceChainId: number | string;
   sourceToken: string;
   sourceAmount: string;
   usdEquivalent: number;
@@ -24,9 +24,24 @@ export interface CheckoutSession {
 
 export function generateCheckoutRoutes(requestedUsd: number): PaymentRoute[] {
   const ethPrice = 3200;
+  const solPrice = 185;
   const ethNeeded = (requestedUsd / ethPrice).toFixed(4);
+  const solNeeded = (requestedUsd / solPrice).toFixed(4);
 
   return [
+    {
+      id: 'route-solana-usdc',
+      sourceChain: 'Solana Mainnet (Phantom)',
+      sourceChainId: 'solana-mainnet',
+      sourceToken: 'USDC (Solana)',
+      sourceAmount: requestedUsd.toFixed(2),
+      usdEquivalent: requestedUsd,
+      estimatedGasUsd: 0.0005,
+      bridgeFeeUsd: 0,
+      totalCostUsd: requestedUsd + 0.0005,
+      recommended: true,
+      speedSeconds: 1,
+    },
     {
       id: 'route-base-usdc',
       sourceChain: 'Base Mainnet',
@@ -37,8 +52,21 @@ export function generateCheckoutRoutes(requestedUsd: number): PaymentRoute[] {
       estimatedGasUsd: 0.05,
       bridgeFeeUsd: 0,
       totalCostUsd: requestedUsd + 0.05,
-      recommended: true,
+      recommended: false,
       speedSeconds: 2,
+    },
+    {
+      id: 'route-solana-sol',
+      sourceChain: 'Solana Mainnet (Phantom)',
+      sourceChainId: 'solana-mainnet',
+      sourceToken: 'SOL',
+      sourceAmount: solNeeded,
+      usdEquivalent: requestedUsd,
+      estimatedGasUsd: 0.001,
+      bridgeFeeUsd: 0,
+      totalCostUsd: requestedUsd + 0.001,
+      recommended: false,
+      speedSeconds: 1,
     },
     {
       id: 'route-base-eth',
@@ -65,19 +93,6 @@ export function generateCheckoutRoutes(requestedUsd: number): PaymentRoute[] {
       totalCostUsd: requestedUsd + 0.75,
       recommended: false,
       speedSeconds: 5,
-    },
-    {
-      id: 'route-ethereum-eth',
-      sourceChain: 'Ethereum Mainnet',
-      sourceChainId: 1,
-      sourceToken: 'ETH',
-      sourceAmount: ethNeeded,
-      usdEquivalent: requestedUsd,
-      estimatedGasUsd: 2.80,
-      bridgeFeeUsd: 1.20,
-      totalCostUsd: requestedUsd + 4.00,
-      recommended: false,
-      speedSeconds: 15,
     },
   ];
 }

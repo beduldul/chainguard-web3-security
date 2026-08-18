@@ -5,9 +5,54 @@ import { MOCK_WALLET_EXPOSURES } from '@/lib/mockData';
 import { ApprovalExposure } from '@/lib/types';
 import { ShieldAlert, ShieldCheck, Lock, Unlock, AlertTriangle, RefreshCw, Trash2, Search, ExternalLink, CheckCircle2 } from 'lucide-react';
 
+const SOLANA_PHANTOM_EXPOSURES: ApprovalExposure[] = [
+  {
+    id: 'sol-exp-1',
+    tokenSymbol: 'USDC (Solana)',
+    tokenName: 'USD Coin SPL Token',
+    tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+    spenderAddress: 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4',
+    spenderName: 'Jupiter v6 Aggregator (Verified)',
+    allowance: 'UNLIMITED (SPL Delegate)',
+    allowanceUsd: 1450,
+    isUnlimited: true,
+    lastActiveDays: 3,
+    contractVerified: true,
+    riskLevel: 'MODERATE',
+  },
+  {
+    id: 'sol-exp-2',
+    tokenSymbol: 'SOL',
+    tokenName: 'Solana Native',
+    tokenAddress: 'So11111111111111111111111111111111111111112',
+    spenderAddress: 'Raydium7z6YwS7yV8k8GjH9gC8KzZ7R9bH',
+    spenderName: 'Raydium Liquidity Pool (Verified)',
+    allowance: 'UNLIMITED',
+    allowanceUsd: 2800,
+    isUnlimited: true,
+    lastActiveDays: 1,
+    contractVerified: true,
+    riskLevel: 'LOW',
+  },
+  {
+    id: 'sol-exp-3',
+    tokenSymbol: 'USDT (Solana)',
+    tokenName: 'Tether USD SPL',
+    tokenAddress: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+    spenderAddress: 'FakeSolAirdropDrainer7777777777777777777',
+    spenderName: 'FakeSolAirdrop.xyz (Unverified Malicious)',
+    allowance: 'UNLIMITED (2^64-1)',
+    allowanceUsd: 1200,
+    isUnlimited: true,
+    lastActiveDays: 12,
+    contractVerified: false,
+    riskLevel: 'CRITICAL',
+  },
+];
+
 export default function WalletExposurePage() {
-  const [addressInput, setAddressInput] = useState('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045');
-  const [exposures, setExposures] = useState<ApprovalExposure[]>(MOCK_WALLET_EXPOSURES);
+  const [addressInput, setAddressInput] = useState('7rDb3Ci2SxS7rDjMJV39do8VR49u5M4sDihNiyjiHMK2');
+  const [exposures, setExposures] = useState<ApprovalExposure[]>(SOLANA_PHANTOM_EXPOSURES);
   const [revokingId, setRevokingId] = useState<string | null>(null);
   const [isBatchRevoking, setIsBatchRevoking] = useState<boolean>(false);
   const [batchRevokedDone, setBatchRevokedDone] = useState<boolean>(false);
@@ -37,10 +82,10 @@ export default function WalletExposurePage() {
   return (
     <div className="space-y-8">
       {/* Header Banner */}
-      <div className="rounded-3xl bg-gradient-to-br from-[#0e1626] via-[#090d16] to-[#07090e] border border-cyan-500/20 p-8 space-y-4 shadow-2xl">
-        <div className="flex items-center gap-2 text-xs font-mono text-cyan-400">
-          <ShieldAlert className="w-4 h-4 text-cyan-400" />
-          <span>Wallet Approval Audit & Allowance Revoker</span>
+      <div className="rounded-3xl bg-gradient-to-br from-[#0e1626] via-[#090d16] to-[#07090e] border border-purple-500/20 p-8 space-y-4 shadow-2xl">
+        <div className="flex items-center gap-2 text-xs font-mono text-purple-300">
+          <ShieldAlert className="w-4 h-4 text-purple-400" />
+          <span>Phantom Wallet SPL Approval Audit & Allowance Revoker</span>
         </div>
 
         <h1 className="text-3xl font-black text-white tracking-tight">
@@ -48,7 +93,7 @@ export default function WalletExposurePage() {
         </h1>
 
         <p className="text-xs sm:text-sm text-gray-300 max-w-2xl leading-relaxed">
-          Scan active ERC20 and ERC721 token allowances. Inactive or unverified smart contracts with unlimited approvals pose an ongoing drain risk to your wallet assets.
+          Scan active Solana SPL token delegates and EVM allowances for Phantom wallet address <span className="font-mono text-purple-300 font-bold">{addressInput}</span>.
         </p>
 
         {/* Address Search Bar */}
@@ -59,12 +104,12 @@ export default function WalletExposurePage() {
               type="text"
               value={addressInput}
               onChange={(e) => setAddressInput(e.target.value)}
-              placeholder="Enter ENS or 0x address..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/60 border border-white/10 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-500"
+              placeholder="Enter Phantom or 0x address..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/60 border border-white/10 text-xs font-mono text-purple-300 focus:outline-none focus:border-purple-500"
             />
           </div>
-          <button className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs transition-all flex items-center justify-center gap-2">
-            <RefreshCw className="w-3.5 h-3.5" /> Scan Wallet Allowances
+          <button className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-black font-extrabold text-xs transition-all flex items-center justify-center gap-2">
+            <RefreshCw className="w-3.5 h-3.5" /> Scan Phantom Wallet
           </button>
         </div>
       </div>
@@ -106,7 +151,7 @@ export default function WalletExposurePage() {
       {batchRevokedDone && (
         <div className="p-4 rounded-2xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-xs font-bold flex items-center gap-2 animate-in fade-in duration-300">
           <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-          <span>Success! All critical and unverified token approvals have been revoked. Total exposure reduced.</span>
+          <span>Success! All critical and unverified token approvals have been revoked for {addressInput}. Total exposure reduced.</span>
         </div>
       )}
 
@@ -114,7 +159,7 @@ export default function WalletExposurePage() {
       <div className="rounded-2xl bg-card border border-cardBorder backdrop-blur-xl overflow-hidden shadow-xl">
         <div className="p-5 border-b border-white/10 flex items-center justify-between">
           <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Lock className="w-4 h-4 text-cyan-400" /> Active Token Allowances ({exposures.length})
+            <Lock className="w-4 h-4 text-purple-400" /> Active Phantom Token Delegates & Allowances ({exposures.length})
           </h3>
           <span className="text-xs text-gray-400 font-mono">1-Click Gasless Revoke Simulation</span>
         </div>
@@ -141,7 +186,7 @@ export default function WalletExposurePage() {
                   </div>
 
                   <p className="text-xs font-mono text-gray-400 flex items-center gap-1">
-                    Spender: <span className="text-cyan-300 font-semibold">{item.spenderName}</span>
+                    Spender: <span className="text-purple-300 font-semibold">{item.spenderName}</span>
                   </p>
                 </div>
 
@@ -166,8 +211,8 @@ export default function WalletExposurePage() {
         ) : (
           <div className="p-12 text-center space-y-3">
             <ShieldCheck className="w-12 h-12 text-emerald-400 mx-auto" />
-            <h4 className="font-bold text-white text-base">Your Wallet is Fully Protected</h4>
-            <p className="text-xs text-gray-400 max-w-sm mx-auto">No high-risk or unverified active approvals remain on this wallet address.</p>
+            <h4 className="font-bold text-white text-base">Your Phantom Wallet is Fully Protected</h4>
+            <p className="text-xs text-gray-400 max-w-sm mx-auto">No high-risk or unverified active approvals remain on address {addressInput}.</p>
           </div>
         )}
       </div>

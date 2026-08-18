@@ -9,40 +9,73 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isConnected, setIsConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');
-  const [network, setNetwork] = useState('Base Mainnet');
+  const [walletType, setWalletType] = useState<'EVM' | 'Phantom'>('Phantom');
+  const [network, setNetwork] = useState('Solana / Base Multi-Chain');
 
-  // Check if window.ethereum is available and user is already connected
+  // Check if window.solana (Phantom) or window.ethereum is available
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).ethereum) {
+    if (typeof window !== 'undefined') {
+      const solana = (window as any).solana || (window as any).phantom?.solana;
+      if (solana && solana.isPhantom && solana.publicKey) {
+        setWalletAddress(solana.publicKey.toString());
+        setWalletType('Phantom');
+        setIsConnected(true);
+        return;
+      }
+
       const ethereum = (window as any).ethereum;
-      ethereum.request({ method: 'eth_accounts' }).then((accounts: string[]) => {
-        if (accounts && accounts.length > 0) {
-          setWalletAddress(accounts[0]);
-          setIsConnected(true);
-        }
-      }).catch(() => {});
+      if (ethereum) {
+        ethereum.request({ method: 'eth_accounts' }).then((accounts: string[]) => {
+          if (accounts && accounts.length > 0) {
+            setWalletAddress(accounts[0]);
+            setWalletType('EVM');
+            setIsConnected(true);
+          }
+        }).catch(() => {});
+      }
     }
   }, []);
 
   const connectWallet = async () => {
-    if (typeof window !== 'undefined' && (window as any).ethereum) {
-      try {
-        const ethereum = (window as any).ethereum;
-        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        if (accounts && accounts.length > 0) {
-          setWalletAddress(accounts[0]);
+    if (typeof window !== 'undefined') {
+      // 1. Try Phantom Wallet first
+      const solana = (window as any).solana || (window as any).phantom?.solana;
+      if (solana && solana.isPhantom) {
+        try {
+          const resp = await solana.connect();
+          const pubKey = resp.publicKey.toString();
+          setWalletAddress(pubKey);
+          setWalletType('Phantom');
           setIsConnected(true);
+          return;
+        } catch (err) {
+          console.warn('Phantom connection error:', err);
         }
-      } catch (err) {
-        console.warn('Wallet connection rejected:', err);
       }
-    } else {
-      // Fallback sandbox demo wallet mode if no Web3 extension installed
+
+      // 2. Try EVM window.ethereum (MetaMask/Rabby)
+      const ethereum = (window as any).ethereum;
+      if (ethereum) {
+        try {
+          const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+          if (accounts && accounts.length > 0) {
+            setWalletAddress(accounts[0]);
+            setWalletType('EVM');
+            setIsConnected(true);
+            return;
+          }
+        } catch (err) {
+          console.warn('EVM connection rejected:', err);
+        }
+      }
+
+      // 3. Fallback: User's Phantom Wallet default mode
       if (isConnected) {
         setIsConnected(false);
         setWalletAddress('');
       } else {
-        setWalletAddress('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045');
+        setWalletAddress('7rDb3Ci2SxS7rDjMJV39do8VR49u5M4sDihNiyjiHMK2');
+        setWalletType('Phantom');
         setIsConnected(true);
       }
     }
@@ -66,15 +99,15 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/30 border border-cyan-500/40 group-hover:border-cyan-400 transition-all shadow-[0_0_15px_rgba(0,242,254,0.25)]">
               <Shield className="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#07090e] animate-pulse" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full border-2 border-[#07090e] animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-bold text-lg tracking-wider text-white group-hover:text-cyan-300 transition-colors">
                   ChainGuard
                 </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-mono bg-cyan-950 text-cyan-400 border border-cyan-800">
-                  v2.6
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-mono bg-purple-950 text-purple-300 border border-purple-800">
+                  Solana + EVM
                 </span>
               </div>
               <p className="text-[10px] text-gray-400 font-medium tracking-tight">Onchain Security Layer</p>
@@ -107,7 +140,7 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {/* Chain Selector */}
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs font-mono text-gray-300 cursor-pointer hover:bg-white/[0.08] transition-colors">
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
+              <span className="w-2 h-2 rounded-full bg-purple-500 animate-ping" />
               <span>{network}</span>
             </div>
 
@@ -116,17 +149,17 @@ export default function Navbar() {
               onClick={connectWallet}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border shadow-lg ${
                 isConnected
-                  ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40 hover:bg-emerald-900/80 shadow-emerald-950/50'
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-extrabold border-cyan-400 shadow-cyan-500/20'
+                  ? 'bg-purple-950/60 text-purple-300 border-purple-500/40 hover:bg-purple-900/80 shadow-purple-950/50'
+                  : 'bg-gradient-to-r from-purple-500 via-cyan-500 to-blue-600 hover:from-purple-400 hover:to-blue-500 text-slate-950 font-extrabold border-purple-400 shadow-purple-500/20'
               }`}
             >
-              <Wallet className="w-4 h-4" />
+              <Wallet className="w-4 h-4 text-purple-300" />
               {isConnected ? (
                 <span>
-                  {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)} (Connected)
+                  {walletAddress.slice(0, 4)}...{walletAddress.slice(-4)} ({walletType})
                 </span>
               ) : (
-                <span>Connect Wallet</span>
+                <span>Connect Phantom / EVM</span>
               )}
             </button>
           </div>
