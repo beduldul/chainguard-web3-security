@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Terminal, Shield, Wallet, ChevronDown, Cpu, Lock } from 'lucide-react';
+import { Terminal, Shield, Wallet, ChevronDown, Cpu, Lock, Bot } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -97,6 +97,7 @@ export default function Navbar() {
   const securityLinks = [
     { href: '/', label: './tx-guardian.sh', desc: 'Calldata Simulator & Risk Score Engine' },
     { href: '/wallet-exposure', label: './wallet-audit.sh', desc: 'Scan & Revoke At-Risk Approvals' },
+    { href: '/ai-agent', label: './ai-agent-bot.sh', desc: 'Autonomous Mempool Drainer Hunter' },
     { href: '/website-scanner', label: './domain-scan.sh', desc: 'Check Phishing & SSL Integrity' },
     { href: '/extension-demo', label: './extension-interceptor.sh', desc: 'Live Chrome Extension Sandbox' },
   ];
@@ -201,14 +202,14 @@ export default function Navbar() {
             </div>
 
             <Link
-              href="/extension-demo"
+              href="/ai-agent"
               className={`px-3 py-1 border ${
-                pathname === '/extension-demo'
+                pathname === '/ai-agent'
                   ? 'bg-[#00ff66] text-black font-bold border-[#00ff66]'
                   : 'bg-black text-gray-300 border-gray-700 hover:border-[#00ff66] hover:text-[#00ff66]'
               }`}
             >
-              ./extension.sh
+              ./ai-agent.sh
             </Link>
 
           </nav>
