@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Shield, ShieldAlert, ShieldCheck, Wallet, ChevronDown, Terminal, Globe, Smartphone, CreditCard, ShoppingBag, Users, Award, Cpu, Gamepad2 } from 'lucide-react';
+import { Terminal, Shield, Wallet, ChevronDown, Cpu, Lock } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -95,91 +95,68 @@ export default function Navbar() {
   };
 
   const securityLinks = [
-    { href: '/', label: 'Tx Guardian Firewall', desc: 'Calldata Simulator & Risk Engine', icon: ShieldCheck },
-    { href: '/wallet-exposure', label: 'Wallet Allowance Audit', desc: 'Scan & Revoke At-Risk Approvals', icon: ShieldAlert },
-    { href: '/website-scanner', label: 'dApp Domain Auditor', desc: 'Check Phishing & SSL Integrity', icon: Globe },
-    { href: '/extension-demo', label: 'Extension Interceptor', desc: 'Live Chrome Overlay Sandbox', icon: Smartphone },
+    { href: '/', label: './tx-guardian.sh', desc: 'Calldata Simulator & Risk Score Engine' },
+    { href: '/wallet-exposure', label: './wallet-audit.sh', desc: 'Scan & Revoke At-Risk Approvals' },
+    { href: '/website-scanner', label: './domain-scan.sh', desc: 'Check Phishing & SSL Integrity' },
+    { href: '/extension-demo', label: './extension-interceptor.sh', desc: 'Live Chrome Extension Sandbox' },
   ];
 
   const appLinks = [
-    { href: '/checkout', label: 'Universal Checkout', desc: 'Stripe for Multi-Chain Crypto', icon: CreditCard },
-    { href: '/payroll', label: 'Crypto Payroll', desc: 'Corporate Batch Disbursal Engine', icon: Users },
-    { href: '/credit-score', label: 'Onchain Credit Score', desc: 'Wallet Reputation & DeFi Rating', icon: Award },
-    { href: '/merchant', label: 'Merchant Portal', desc: 'Embeddable Payment Widget Code', icon: ShoppingBag },
-    { href: '/sdk-docs', label: 'Developer SDK & API', desc: 'Live REST API Testing Sandbox', icon: Terminal },
+    { href: '/checkout', label: './checkout-router.sh', desc: 'Stripe for Multi-Chain Crypto' },
+    { href: '/payroll', label: './crypto-payroll.sh', desc: 'Corporate Batch Disbursal Engine' },
+    { href: '/credit-score', label: './credit-score.sh', desc: 'Wallet Reputation & DeFi Rating' },
+    { href: '/merchant', label: './merchant-portal.sh', desc: 'Embeddable Payment Widget Code' },
+    { href: '/sdk-docs', label: './api-sandbox.sh', desc: 'Live REST API Testing Sandbox' },
   ];
 
-  const isSecurityActive = securityLinks.some((l) => l.href === pathname);
-  const isAppsActive = appLinks.some((l) => l.href === pathname);
-
   return (
-    <header className="sticky top-0 z-50 bg-[#0b0c10] border-b-4 border-[#ff0055] py-2">
+    <header className="sticky top-0 z-50 bg-[#07090e] border-b border-[#00ff66] font-cli text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 gap-4 font-vt323">
+        <div className="flex items-center justify-between h-12 gap-4">
           
-          {/* Logo Section - Pixel Art HUD */}
-          <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <div className="w-10 h-10 bg-[#ff0055] text-white border-2 border-black flex items-center justify-center font-bold text-xl shadow-[4px_4px_0px_0px_#000]">
-              👾
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-pixel text-xs text-[#00ff66] tracking-wider">
-                  CHAINGUARD
-                </span>
-                <span className="font-pixel text-[8px] px-1.5 py-0.5 bg-[#ffe600] text-black font-bold">
-                  8-BIT
-                </span>
-              </div>
-              <p className="text-xs text-yellow-400 leading-none mt-1">[SYSTEM LEVEL 100 • READY]</p>
-            </div>
+          {/* CLI Terminal Prompt Logo */}
+          <Link href="/" className="flex items-center gap-2 group shrink-0">
+            <span className="text-[#00ff66] font-bold">root@chainguard:~#</span>
+            <span className="text-gray-400 font-mono text-[11px] hidden sm:inline">[v2.6 SECURED]</span>
           </Link>
 
-          {/* Categorized Dropdown Pixel Navigation */}
-          <nav className="hidden md:flex items-center gap-3 font-pixel">
+          {/* Terminal Command Dropdowns */}
+          <nav className="hidden md:flex items-center gap-4">
             
-            {/* 1. Security Core Dropdown */}
+            {/* 1. Security Tools Dropdown */}
             <div className="relative" ref={securityRef}>
               <button
                 onClick={() => {
                   setSecurityMenuOpen(!securityMenuOpen);
                   setAppsMenuOpen(false);
                 }}
-                className={`flex items-center gap-2 px-3 py-2 text-[10px] uppercase transition-all ${
-                  isSecurityActive
-                    ? 'pixel-btn-pink'
-                    : 'pixel-btn-dark'
+                className={`flex items-center gap-1.5 px-3 py-1 border transition-all ${
+                  securityLinks.some(l => l.href === pathname)
+                    ? 'bg-[#00ff66] text-black font-bold border-[#00ff66]'
+                    : 'bg-black text-[#00ff66] border-[#00ff66]/40 hover:border-[#00ff66]'
                 }`}
               >
-                <ShieldCheck className="w-4 h-4 text-white" />
-                <span>SECURITY HUB</span>
-                <ChevronDown className={`w-3.5 h-3.5 ${securityMenuOpen ? 'rotate-180' : ''}`} />
+                <span>$ ./security-hub</span>
+                <ChevronDown className="w-3 h-3" />
               </button>
 
               {securityMenuOpen && (
-                <div className="absolute left-0 mt-2 w-72 bg-[#12131c] border-4 border-[#ff0055] shadow-[6px_6px_0px_0px_#000] p-2 space-y-1 z-50 font-vt323">
-                  {securityLinks.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = pathname === item.href;
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setSecurityMenuOpen(false)}
-                        className={`flex items-start gap-3 p-2 transition-all ${
-                          isActive
-                            ? 'bg-[#ff0055] text-white font-bold'
-                            : 'hover:bg-[#1e202e] text-gray-200 hover:text-white'
-                        }`}
-                      >
-                        <Icon className="w-5 h-5 mt-0.5 shrink-0 text-[#00ff66]" />
-                        <div>
-                          <div className="text-base font-bold leading-tight">{item.label}</div>
-                          <div className="text-xs text-gray-400">{item.desc}</div>
-                        </div>
-                      </Link>
-                    );
-                  })}
+                <div className="absolute left-0 mt-2 w-72 bg-[#0a0c10] border border-[#00ff66] p-2 space-y-1 z-50 shadow-[0_0_20px_rgba(0,255,102,0.2)]">
+                  {securityLinks.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setSecurityMenuOpen(false)}
+                      className={`block p-2 border ${
+                        pathname === item.href
+                          ? 'bg-[#00ff66] text-black font-bold border-[#00ff66]'
+                          : 'border-transparent text-gray-300 hover:bg-[#121620] hover:text-[#00ff66]'
+                      }`}
+                    >
+                      <div className="font-bold">{item.label}</div>
+                      <div className="text-[10px] text-gray-400">{item.desc}</div>
+                    </Link>
+                  ))}
                 </div>
               )}
             </div>
@@ -191,64 +168,64 @@ export default function Navbar() {
                   setAppsMenuOpen(!appsMenuOpen);
                   setSecurityMenuOpen(false);
                 }}
-                className={`flex items-center gap-2 px-3 py-2 text-[10px] uppercase transition-all ${
-                  isAppsActive
-                    ? 'pixel-btn-yellow'
-                    : 'pixel-btn-dark'
+                className={`flex items-center gap-1.5 px-3 py-1 border transition-all ${
+                  appLinks.some(l => l.href === pathname)
+                    ? 'bg-[#ffb000] text-black font-bold border-[#ffb000]'
+                    : 'bg-black text-[#ffb000] border-[#ffb000]/40 hover:border-[#ffb000]'
                 }`}
               >
-                <Cpu className="w-4 h-4" />
-                <span>WEB3 SUITE</span>
-                <ChevronDown className={`w-3.5 h-3.5 ${appsMenuOpen ? 'rotate-180' : ''}`} />
+                <span>$ ./web3-apps</span>
+                <ChevronDown className="w-3 h-3" />
               </button>
 
               {appsMenuOpen && (
-                <div className="absolute left-0 mt-2 w-80 bg-[#12131c] border-4 border-[#ffe600] shadow-[6px_6px_0px_0px_#000] p-2 space-y-1 z-50 font-vt323">
-                  {appLinks.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = pathname === item.href;
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setAppsMenuOpen(false)}
-                        className={`flex items-start gap-3 p-2 transition-all ${
-                          isActive
-                            ? 'bg-[#ffe600] text-black font-bold'
-                            : 'hover:bg-[#1e202e] text-gray-200 hover:text-white'
-                        }`}
-                      >
-                        <Icon className="w-5 h-5 mt-0.5 shrink-0 text-[#00f2fe]" />
-                        <div>
-                          <div className="text-base font-bold leading-tight">{item.label}</div>
-                          <div className="text-xs text-gray-400">{item.desc}</div>
-                        </div>
-                      </Link>
-                    );
-                  })}
+                <div className="absolute left-0 mt-2 w-80 bg-[#0a0c10] border border-[#ffb000] p-2 space-y-1 z-50 shadow-[0_0_20px_rgba(255,176,0,0.2)]">
+                  {appLinks.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setAppsMenuOpen(false)}
+                      className={`block p-2 border ${
+                        pathname === item.href
+                          ? 'bg-[#ffb000] text-black font-bold border-[#ffb000]'
+                          : 'border-transparent text-gray-300 hover:bg-[#121620] hover:text-[#ffb000]'
+                      }`}
+                    >
+                      <div className="font-bold">{item.label}</div>
+                      <div className="text-[10px] text-gray-400">{item.desc}</div>
+                    </Link>
+                  ))}
                 </div>
               )}
             </div>
 
+            <Link
+              href="/extension-demo"
+              className={`px-3 py-1 border ${
+                pathname === '/extension-demo'
+                  ? 'bg-[#00ff66] text-black font-bold border-[#00ff66]'
+                  : 'bg-black text-gray-300 border-gray-700 hover:border-[#00ff66] hover:text-[#00ff66]'
+              }`}
+            >
+              ./extension.sh
+            </Link>
+
           </nav>
 
-          {/* Right Actions: Pixel Wallet Button */}
+          {/* Right Wallet Action */}
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={connectWallet}
-              className={`flex items-center gap-2 px-3 py-2 text-[10px] font-pixel transition-all ${
+              className={`px-3 py-1 border font-bold transition-all ${
                 isConnected
-                  ? 'pixel-btn-cyan'
-                  : 'pixel-btn-yellow'
+                  ? 'bg-[#00ff66] text-black border-[#00ff66]'
+                  : 'bg-[#ffb000] text-black border-[#ffb000]'
               }`}
             >
-              <Gamepad2 className="w-4 h-4" />
               {isConnected ? (
-                <span>
-                  {walletAddress.slice(0, 4)}...{walletAddress.slice(-4)} ({walletType})
-                </span>
+                <span>[{walletAddress.slice(0, 4)}...{walletAddress.slice(-4)} ({walletType})]</span>
               ) : (
-                <span>CONNECT WALLET</span>
+                <span>[AUTH_WALLET]</span>
               )}
             </button>
           </div>
