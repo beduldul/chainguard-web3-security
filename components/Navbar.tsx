@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Shield, ShieldAlert, ShieldCheck, Wallet, ChevronDown, Terminal, Globe, Smartphone, CreditCard, ShoppingBag, Users } from 'lucide-react';
+import { Shield, ShieldAlert, ShieldCheck, Wallet, ChevronDown, Terminal, Globe, Smartphone, CreditCard, ShoppingBag, Users, Award } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -86,6 +86,7 @@ export default function Navbar() {
     { href: '/wallet-exposure', label: 'Wallet Exposure', icon: ShieldAlert },
     { href: '/checkout', label: 'Universal Checkout', icon: CreditCard },
     { href: '/payroll', label: 'Crypto Payroll', icon: Users },
+    { href: '/credit-score', label: 'Credit Score', icon: Award },
     { href: '/merchant', label: 'Merchant Portal', icon: ShoppingBag },
     { href: '/extension-demo', label: 'Extension Demo', icon: Smartphone },
     { href: '/sdk-docs', label: 'Developer SDK', icon: Terminal },
