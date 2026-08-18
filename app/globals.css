@@ -1,63 +1,172 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Fira+Code:wght@500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: 240 10% 4%;
-  --foreground: 0 0% 98%;
+  --background: 0 0% 5%;
+  --foreground: 0 0% 95%;
+}
+
+* {
+  border-radius: 0px !important; /* Pure 8-Bit Pixel Rectangles */
 }
 
 body {
-  color: #f3f4f6;
-  background-color: #07080c;
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  letter-spacing: -0.015em;
+  color: #ffffff;
+  background-color: #0b0c10;
+  font-family: 'VT323', 'Press Start 2P', monospace;
+  font-size: 18px;
   overflow-x: hidden;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.07) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
-  background-attachment: fixed;
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%),
+    linear-gradient(90deg, rgba(255, 0, 85, 0.03), rgba(0, 255, 102, 0.01), rgba(0, 242, 254, 0.03));
+  background-size: 100% 4px, 6px 100%;
 }
 
-.font-mono-clean {
-  font-family: 'JetBrains Mono', monospace;
+/* 8-Bit Pixel Fonts */
+.font-pixel {
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: -0.05em;
 }
 
-/* Glassmorphism Luxury Cards */
+.font-vt323 {
+  font-family: 'VT323', monospace;
+  font-size: 1.25rem;
+}
+
+/* 8-Bit Pixel Boxes & Borders */
+.pixel-box-pink {
+  background-color: #12131c;
+  border: 4px solid #ff0055;
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+.pixel-box-cyan {
+  background-color: #12131c;
+  border: 4px solid #00f2fe;
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+.pixel-box-yellow {
+  background-color: #12131c;
+  border: 4px solid #ffe600;
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+.pixel-box-green {
+  background-color: #12131c;
+  border: 4px solid #00ff66;
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+.pixel-box-purple {
+  background-color: #12131c;
+  border: 4px solid #a800ff;
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+/* 8-Bit Retro Buttons with Tactile Press */
+.pixel-btn-pink {
+  background-color: #ff0055;
+  color: #ffffff;
+  border: 3px solid #ff6699;
+  box-shadow: 4px 4px 0px 0px #000000;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.05s ease;
+}
+.pixel-btn-pink:hover {
+  background-color: #ff3377;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+.pixel-btn-pink:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.pixel-btn-yellow {
+  background-color: #ffe600;
+  color: #000000;
+  border: 3px solid #ffff66;
+  box-shadow: 4px 4px 0px 0px #000000;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.05s ease;
+}
+.pixel-btn-yellow:hover {
+  background-color: #ffff33;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+.pixel-btn-yellow:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.pixel-btn-cyan {
+  background-color: #00f2fe;
+  color: #000000;
+  border: 3px solid #66f7ff;
+  box-shadow: 4px 4px 0px 0px #000000;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.05s ease;
+}
+.pixel-btn-cyan:hover {
+  background-color: #33f5ff;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+.pixel-btn-cyan:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.pixel-btn-dark {
+  background-color: #1e202e;
+  color: #ffffff;
+  border: 3px solid #3a3d54;
+  box-shadow: 4px 4px 0px 0px #000000;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.05s ease;
+}
+.pixel-btn-dark:hover {
+  background-color: #2b2e42;
+  border-color: #5c6082;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+/* Custom Pixel Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0c10;
+  border: 2px solid #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #ff0055;
+  border: 2px solid #000;
+}
+
 .bg-card {
-  background: rgba(15, 17, 26, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.bg-card-hover {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.bg-card-hover:hover {
-  border-color: rgba(168, 85, 247, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+  background-color: #12131c;
+  border: 3px solid #3a3d54;
+  box-shadow: 5px 5px 0px 0px #000000;
 }
 
 .border-cardBorder {
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-/* Custom Sleek Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #07080c;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.5);
+  border-color: #3a3d54;
 }
