@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Shield, ShieldAlert, ShieldCheck, Wallet, ChevronDown, Terminal, Globe, Smartphone, CreditCard, ShoppingBag, Users, Award, Cpu, Sparkles } from 'lucide-react';
+import { Shield, ShieldAlert, ShieldCheck, Wallet, ChevronDown, Terminal, Globe, Smartphone, CreditCard, ShoppingBag, Users, Award, Cpu } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -17,7 +17,6 @@ export default function Navbar() {
   const securityRef = useRef<HTMLDivElement>(null);
   const appsRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (securityRef.current && !securityRef.current.contains(event.target as Node)) {
@@ -31,7 +30,6 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Detect Phantom / EVM wallet
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const solana = (window as any).solana || (window as any).phantom?.solana;
@@ -85,7 +83,6 @@ export default function Navbar() {
         }
       }
 
-      // Default sandbox address
       if (isConnected) {
         setIsConnected(false);
         setWalletAddress('');
@@ -98,7 +95,7 @@ export default function Navbar() {
   };
 
   const securityLinks = [
-    { href: '/', label: 'Tx Guardian Firewall', desc: 'Calldata Simulator & Risk Score', icon: ShieldCheck },
+    { href: '/', label: 'Tx Guardian Firewall', desc: 'Calldata Simulator & Risk Engine', icon: ShieldCheck },
     { href: '/wallet-exposure', label: 'Wallet Allowance Audit', desc: 'Scan & Revoke At-Risk Approvals', icon: ShieldAlert },
     { href: '/website-scanner', label: 'dApp Domain Auditor', desc: 'Check Phishing & SSL Integrity', icon: Globe },
     { href: '/extension-demo', label: 'Extension Interceptor', desc: 'Live Chrome Overlay Sandbox', icon: Smartphone },
@@ -116,30 +113,30 @@ export default function Navbar() {
   const isAppsActive = appLinks.some((l) => l.href === pathname);
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-2xl bg-[#060810]/90 border-b-2 border-cyan-500/40">
+    <header className="sticky top-0 z-50 bg-[#0c0d12] border-b-2 border-yellow-500/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           
-          {/* Logo Section - Retro Pixel Styling */}
+          {/* Logo Section - 8-Bit Retro Arcade */}
           <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <div className="w-9 h-9 bg-cyan-950 border-2 border-cyan-400 flex items-center justify-center pixel-btn group-hover:bg-cyan-900 transition-all">
-              <Shield className="w-5 h-5 text-cyan-400" />
+            <div className="w-9 h-9 bg-yellow-500 text-black border-2 border-yellow-300 flex items-center justify-center font-bold text-lg shadow-[3px_3px_0px_0px_#713f12]">
+              🛡️
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-pixel text-xs tracking-wider text-cyan-300 group-hover:text-cyan-200">
-                  CHAIN<span className="text-purple-400">GUARD</span>
+                <span className="font-pixel text-xs tracking-wider text-yellow-400">
+                  CHAINGUARD
                 </span>
-                <span className="font-pixel text-[8px] px-1.5 py-0.5 bg-purple-950 text-purple-300 border border-purple-500">
+                <span className="font-pixel text-[8px] px-1.5 py-0.5 bg-green-950 text-green-400 border border-green-600">
                   8-BIT
                 </span>
               </div>
-              <p className="text-[10px] font-tech text-gray-400 tracking-tight">EVM + SOLANA SECURITY</p>
+              <p className="text-[10px] font-mono text-zinc-400 tracking-tight">[SECURITY LAYER OK]</p>
             </div>
           </Link>
 
-          {/* Categorized Dropdown Navigation Bar (Prevents Overcrowding) */}
-          <nav className="hidden md:flex items-center gap-2">
+          {/* Categorized Dropdown Navigation Bar */}
+          <nav className="hidden md:flex items-center gap-3 font-mono">
             
             {/* 1. Security Core Dropdown */}
             <div className="relative" ref={securityRef}>
@@ -148,19 +145,19 @@ export default function Navbar() {
                   setSecurityMenuOpen(!securityMenuOpen);
                   setAppsMenuOpen(false);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 text-xs font-bold font-tech uppercase tracking-wider transition-all border-2 ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold uppercase transition-all ${
                   isSecurityActive
-                    ? 'bg-cyan-950/80 text-cyan-300 border-cyan-400 shadow-[0_0_12px_rgba(0,242,254,0.3)]'
-                    : 'bg-black/50 text-gray-300 border-white/10 hover:border-cyan-500/50 hover:text-white'
+                    ? 'bg-yellow-500 text-black border-2 border-yellow-300 shadow-[3px_3px_0px_0px_#000]'
+                    : 'bg-zinc-900 text-zinc-300 border-2 border-zinc-700 hover:border-yellow-400 hover:text-white'
                 }`}
               >
-                <ShieldCheck className="w-4 h-4 text-cyan-400" />
-                <span>Security Hub</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${securityMenuOpen ? 'rotate-180 text-cyan-400' : 'text-gray-400'}`} />
+                <ShieldCheck className="w-4 h-4" />
+                <span>SECURITY HUB</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${securityMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {securityMenuOpen && (
-                <div className="absolute left-0 mt-2 w-72 bg-[#090d16] border-2 border-cyan-400 shadow-[4px_4px_0px_0px_#00f2fe] p-2 space-y-1 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute left-0 mt-2 w-72 bg-[#14161f] border-2 border-yellow-400 shadow-[6px_6px_0px_0px_#000] p-2 space-y-1 z-50">
                   {securityLinks.map((item) => {
                     const Icon = item.icon;
                     const isActive = pathname === item.href;
@@ -169,16 +166,16 @@ export default function Navbar() {
                         key={item.href}
                         href={item.href}
                         onClick={() => setSecurityMenuOpen(false)}
-                        className={`flex items-start gap-3 p-2.5 rounded-none transition-all border ${
+                        className={`flex items-start gap-3 p-2.5 transition-all ${
                           isActive
-                            ? 'bg-cyan-950/80 border-cyan-400 text-cyan-200'
-                            : 'border-transparent hover:bg-white/[0.05] text-gray-300 hover:text-white'
+                            ? 'bg-yellow-500 text-black font-bold'
+                            : 'hover:bg-zinc-800 text-zinc-300 hover:text-white'
                         }`}
                       >
-                        <Icon className="w-4 h-4 text-cyan-400 mt-0.5 shrink-0" />
+                        <Icon className="w-4 h-4 mt-0.5 shrink-0" />
                         <div>
-                          <div className="text-xs font-bold font-tech">{item.label}</div>
-                          <div className="text-[10px] text-gray-400 leading-tight">{item.desc}</div>
+                          <div className="text-xs font-bold">{item.label}</div>
+                          <div className="text-[10px] opacity-80">{item.desc}</div>
                         </div>
                       </Link>
                     );
@@ -194,19 +191,19 @@ export default function Navbar() {
                   setAppsMenuOpen(!appsMenuOpen);
                   setSecurityMenuOpen(false);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 text-xs font-bold font-tech uppercase tracking-wider transition-all border-2 ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold uppercase transition-all ${
                   isAppsActive
-                    ? 'bg-purple-950/80 text-purple-300 border-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.3)]'
-                    : 'bg-black/50 text-gray-300 border-white/10 hover:border-purple-500/50 hover:text-white'
+                    ? 'bg-green-500 text-black border-2 border-green-300 shadow-[3px_3px_0px_0px_#000]'
+                    : 'bg-zinc-900 text-zinc-300 border-2 border-zinc-700 hover:border-green-400 hover:text-white'
                 }`}
               >
-                <Cpu className="w-4 h-4 text-purple-400" />
-                <span>Web3 Startup Suite</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${appsMenuOpen ? 'rotate-180 text-purple-400' : 'text-gray-400'}`} />
+                <Cpu className="w-4 h-4" />
+                <span>WEB3 SUITE</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${appsMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {appsMenuOpen && (
-                <div className="absolute left-0 mt-2 w-80 bg-[#090d16] border-2 border-purple-400 shadow-[4px_4px_0px_0px_#a855f7] p-2 space-y-1 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute left-0 mt-2 w-80 bg-[#14161f] border-2 border-green-400 shadow-[6px_6px_0px_0px_#000] p-2 space-y-1 z-50">
                   {appLinks.map((item) => {
                     const Icon = item.icon;
                     const isActive = pathname === item.href;
@@ -215,16 +212,16 @@ export default function Navbar() {
                         key={item.href}
                         href={item.href}
                         onClick={() => setAppsMenuOpen(false)}
-                        className={`flex items-start gap-3 p-2.5 transition-all border ${
+                        className={`flex items-start gap-3 p-2.5 transition-all ${
                           isActive
-                            ? 'bg-purple-950/80 border-purple-400 text-purple-200'
-                            : 'border-transparent hover:bg-white/[0.05] text-gray-300 hover:text-white'
+                            ? 'bg-green-500 text-black font-bold'
+                            : 'hover:bg-zinc-800 text-zinc-300 hover:text-white'
                         }`}
                       >
-                        <Icon className="w-4 h-4 text-purple-400 mt-0.5 shrink-0" />
+                        <Icon className="w-4 h-4 mt-0.5 shrink-0" />
                         <div>
-                          <div className="text-xs font-bold font-tech">{item.label}</div>
-                          <div className="text-[10px] text-gray-400 leading-tight">{item.desc}</div>
+                          <div className="text-xs font-bold">{item.label}</div>
+                          <div className="text-[10px] opacity-80">{item.desc}</div>
                         </div>
                       </Link>
                     );
@@ -233,39 +230,24 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Direct Quick Link: Extension Playground */}
-            <Link
-              href="/extension-demo"
-              className={`px-3 py-2 text-xs font-bold font-tech uppercase tracking-wider transition-all border-2 ${
-                pathname === '/extension-demo'
-                  ? 'bg-cyan-950 text-cyan-300 border-cyan-400'
-                  : 'bg-black/40 text-gray-400 border-white/10 hover:text-white hover:border-white/30'
-              }`}
-            >
-              Extension
-            </Link>
-
           </nav>
 
-          {/* Right Actions: Network Indicator & Pixel Wallet Button */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* Right Actions: Network Indicator & 8-Bit Wallet Button */}
+          <div className="flex items-center gap-3 shrink-0 font-mono">
             
-            {/* Multi-Chain Badge */}
-            <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-black/60 border-2 border-purple-500/40 text-xs font-tech text-purple-300">
-              <span className="w-2 h-2 bg-purple-400 rounded-none animate-pulse" />
-              <span>SOLANA + BASE</span>
+            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-700 text-[11px] text-yellow-400 font-bold">
+              <span>SOLANA + EVM</span>
             </div>
 
-            {/* Pixel Button Wallet Connect */}
             <button
               onClick={connectWallet}
-              className={`flex items-center gap-2 px-4 py-2 text-xs font-bold font-tech transition-all border-2 ${
+              className={`flex items-center gap-2 px-4 py-2 text-xs font-bold transition-all ${
                 isConnected
-                  ? 'bg-purple-950 text-purple-300 border-purple-400 shadow-[3px_3px_0px_0px_#a855f7]'
-                  : 'bg-cyan-500 text-black border-cyan-300 pixel-btn font-extrabold'
+                  ? 'bg-green-500 text-black border-2 border-green-300 shadow-[3px_3px_0px_0px_#000]'
+                  : 'pixel-btn-gold text-black'
               }`}
             >
-              <Wallet className="w-4 h-4" />
+              <Wallet className="w-4 h-4 text-black" />
               {isConnected ? (
                 <span>
                   {walletAddress.slice(0, 4)}...{walletAddress.slice(-4)} ({walletType})

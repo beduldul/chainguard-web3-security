@@ -1,22 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&family=VT323&family=Chakra+Petch:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Fira+Code:wght@400;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: 224 71% 4%;
-  --foreground: 213 31% 91%;
+  --background: 0 0% 5%;
+  --foreground: 0 0% 95%;
 }
 
 body {
-  color: #e2e8f0;
-  background-color: #05070c;
-  font-family: 'Chakra Petch', 'Share Tech Mono', monospace;
+  color: #f4f4f5;
+  background-color: #0c0d12;
+  font-family: 'Fira Code', monospace;
   overflow-x: hidden;
 }
 
-/* Pixel Art & Retro Arcade Font Utility */
+/* Authentic 8-Bit Pixel Fonts */
 .font-pixel {
   font-family: 'Press Start 2P', monospace;
 }
@@ -25,94 +25,110 @@ body {
   font-family: 'VT323', monospace;
 }
 
-.font-tech {
-  font-family: 'Share Tech Mono', monospace;
+.font-mono-clean {
+  font-family: 'Fira Code', monospace;
 }
 
-/* Pixel Border Shadows */
-.pixel-border {
-  box-shadow: 
-    -3px 0 0 0 #00f2fe,
-    3px 0 0 0 #00f2fe,
-    0 -3px 0 0 #00f2fe,
-    0 3px 0 0 #00f2fe;
+/* NO BLURRY AI GLOWS - HARD RETRO 8-BIT SHADOWS ONLY */
+.pixel-box {
+  background-color: #14161f;
+  border: 2px solid #3f3f46;
+  box-shadow: 4px 4px 0px 0px #000000;
 }
 
-.pixel-border-rose {
-  box-shadow: 
-    -3px 0 0 0 #ff2a5f,
-    3px 0 0 0 #ff2a5f,
-    0 -3px 0 0 #ff2a5f,
-    0 3px 0 0 #ff2a5f;
+.pixel-box-gold {
+  background-color: #14161f;
+  border: 2px solid #eab308;
+  box-shadow: 4px 4px 0px 0px #854d0e;
 }
 
-.pixel-border-emerald {
-  box-shadow: 
-    -3px 0 0 0 #10b981,
-    3px 0 0 0 #10b981,
-    0 -3px 0 0 #10b981,
-    0 3px 0 0 #10b981;
+.pixel-box-green {
+  background-color: #14161f;
+  border: 2px solid #22c55e;
+  box-shadow: 4px 4px 0px 0px #15803d;
 }
 
-.pixel-btn {
-  box-shadow: 3px 3px 0px 0px #00f2fe;
-  transition: all 0.1s ease;
+.pixel-box-red {
+  background-color: #14161f;
+  border: 2px solid #ef4444;
+  box-shadow: 4px 4px 0px 0px #991b1b;
 }
 
-.pixel-btn:hover {
+/* 8-Bit Retro Button (Tactile 3D Press Effect) */
+.pixel-btn-gold {
+  background-color: #eab308;
+  color: #000000;
+  border: 2px solid #fef08a;
+  box-shadow: 4px 4px 0px 0px #713f12;
+  font-weight: 800;
+  transition: all 0.05s ease;
+}
+
+.pixel-btn-gold:hover {
+  background-color: #facc15;
   transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0px 0px #00f2fe;
+  box-shadow: 5px 5px 0px 0px #713f12;
 }
 
-.pixel-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px 0px #00f2fe;
+.pixel-btn-gold:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0px 0px #713f12;
 }
 
-.pixel-btn-purple {
-  box-shadow: 3px 3px 0px 0px #a855f7;
-}
-.pixel-btn-purple:hover {
-  box-shadow: 4px 4px 0px 0px #c084fc;
-}
-
-/* Retro Scanlines Background Overlay */
-.scanlines {
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%, 
-    rgba(0, 0, 0, 0.35) 50%
-  ), linear-gradient(
-    90deg,
-    rgba(255, 0, 0, 0.03),
-    rgba(0, 255, 0, 0.01),
-    rgba(0, 0, 255, 0.03)
-  );
-  background-size: 100% 4px, 6px 100%;
+.pixel-btn-dark {
+  background-color: #1f2937;
+  color: #f3f4f6;
+  border: 2px solid #4b5563;
+  box-shadow: 4px 4px 0px 0px #000000;
+  transition: all 0.05s ease;
 }
 
-/* Custom Scrollbars */
+.pixel-btn-dark:hover {
+  background-color: #374151;
+  border-color: #9ca3af;
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0px 0px #000000;
+}
+
+.pixel-btn-dark:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0px 0px #000000;
+}
+
+/* CRT Arcade Scanlines (Subtle Retro Overlay) */
+.crt-scanlines {
+  position: relative;
+}
+
+.crt-scanlines::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Custom Pixel Scrollbars */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #05070c;
+  background: #0c0d12;
 }
 ::-webkit-scrollbar-thumb {
-  background: #00f2fe;
-  border-radius: 0px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #38bdf8;
+  background: #eab308;
+  border: 1px solid #713f12;
 }
 
-/* Glassmorphism Pixel Card */
 .bg-card {
-  background: rgba(10, 14, 23, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: #14161f;
 }
 
 .border-cardBorder {
-  border-color: rgba(0, 242, 254, 0.2);
+  border-color: #27272a;
 }
