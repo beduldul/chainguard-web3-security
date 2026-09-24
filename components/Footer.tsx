@@ -17,7 +17,7 @@ export default function Footer() {
               <span className="text-gray-400 font-mono text-xs">[v2.6 SECURED SYSTEM]</span>
             </div>
             <p className="text-xs text-gray-400 leading-relaxed max-w-md font-mono">
-              The next-generation Web3 security firewall & multi-startup ecosystem. Real-time EVM calldata simulation, Solana Phantom wallet protection, automated recurring crypto billing, and autonomous AI drainer bot hunter.
+              A Web3 security firewall & multi-startup ecosystem. Real-time EVM calldata simulation, Solana Phantom wallet protection, automated recurring crypto billing, and autonomous AI drainer bot hunter.
             </p>
             <div className="flex items-center gap-2 text-[11px] text-[#00ff66] font-mono">
               <span className="w-2 h-2 rounded-full bg-[#00ff66] animate-pulse" />

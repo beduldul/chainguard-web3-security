@@ -133,7 +133,7 @@ export default function CheckoutPage() {
             <div className="p-4 rounded-xl bg-black/60 border border-cyan-500/40 text-center space-y-2 font-mono text-xs">
               <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin mx-auto" />
               <p className="text-cyan-300 font-bold">Executing Cross-Chain Payment Route...</p>
-              <p className="text-[11px] text-gray-400">Swapping {selectedRoute.sourceToken} on {selectedRoute.sourceChain} ➔ Settling USDC to Merchant</p>
+              <p className="text-[11px] text-gray-400">Swapping {selectedRoute.sourceToken} on {selectedRoute.sourceChain} &rarr; Settling USDC to Merchant</p>
             </div>
           ) : (
             <div className="p-6 rounded-xl bg-emerald-950/80 border border-emerald-500/50 text-center space-y-2">

@@ -155,7 +155,7 @@ export default function BountiesPage() {
                 </div>
                 {bounty.claimedByWallet && (
                   <div className="text-[#00ff66] text-[11px]">
-                    ✓ Paid to Wallet: <span className="font-bold">{bounty.claimedByWallet}</span>
+                    Paid to Wallet: <span className="font-bold">{bounty.claimedByWallet}</span>
                   </div>
                 )}
               </div>

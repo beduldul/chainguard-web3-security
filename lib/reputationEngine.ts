@@ -25,7 +25,7 @@ export function calculateWalletReputation(address: string): WalletReputation {
       liquidationsCount: 0,
       averageBalanceUsd: 8200,
       collateralDiscount: '30% Collateral Discount on DeFi Loans',
-      badge: '🏆 TOP 5% ONCHAIN CREDIT TIER',
+      badge: 'TOP 5% ONCHAIN CREDIT TIER',
     };
   }
 
@@ -39,6 +39,6 @@ export function calculateWalletReputation(address: string): WalletReputation {
     liquidationsCount: 0,
     averageBalanceUsd: 3400,
     collateralDiscount: '15% Collateral Discount on DeFi Loans',
-    badge: '⭐ VERIFIED REPUTABLE WALLET',
+    badge: 'VERIFIED REPUTABLE WALLET',
   };
 }

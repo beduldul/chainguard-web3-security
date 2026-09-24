@@ -135,7 +135,7 @@ export default function AIAgentPage() {
               </div>
 
               <div className="text-[#00ff66] font-bold pt-1">
-                ✓ STATUS: {evt.status} (Syncing Chrome Extension Rules...)
+                STATUS: {evt.status} (Syncing Chrome Extension Rules...)
               </div>
             </div>
           ))}

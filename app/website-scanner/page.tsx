@@ -117,9 +117,9 @@ export default function WebsiteScannerPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-white">{scanResult.domainAgeDays} Days</span>
                 {scanResult.domainAgeDays < 7 ? (
-                  <span className="text-rose-400 font-bold text-xs bg-rose-950 px-2 py-0.5 rounded border border-rose-800">⚠️ VERY NEW</span>
+                  <span className="text-rose-400 font-bold text-xs bg-rose-950 px-2 py-0.5 rounded border border-rose-800">VERY NEW</span>
                 ) : (
-                  <span className="text-emerald-400 font-bold text-xs bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">✅ ESTABLISHED</span>
+                  <span className="text-emerald-400 font-bold text-xs bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">ESTABLISHED</span>
                 )}
               </div>
             </div>
@@ -138,7 +138,7 @@ export default function WebsiteScannerPage() {
               <span className="text-xs font-sans text-gray-400 font-bold block">Frontend Script Audit</span>
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-bold ${scanResult.frontendRisk ? 'text-rose-400' : 'text-emerald-400'}`}>
-                  {scanResult.frontendRisk ? '🔴 Suspicious Scripts' : '✅ Clean Code'}
+                  {scanResult.frontendRisk ? 'Suspicious Scripts' : 'Clean Code'}
                 </span>
               </div>
             </div>
@@ -148,7 +148,7 @@ export default function WebsiteScannerPage() {
               <span className="text-xs font-sans text-gray-400 font-bold block">Security Blacklist Check</span>
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-bold ${scanResult.reportedPhishing ? 'text-rose-400' : 'text-emerald-400'}`}>
-                  {scanResult.reportedPhishing ? '🔴 FLAGGED SCAM' : '✅ No Reports'}
+                  {scanResult.reportedPhishing ? 'FLAGGED SCAM' : 'No Reports'}
                 </span>
               </div>
             </div>

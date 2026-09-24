@@ -88,7 +88,7 @@ export default function EscrowPage() {
                       {releasingId === ms.id ? '[RELEASING...]' : '[RELEASE_PAYMENT_TO_FREELANCER]'}
                     </button>
                   ) : (
-                    <span className="text-[#00ff66] font-bold">✓ DISBURSED TO PHANTOM WALLET</span>
+                    <span className="text-[#00ff66] font-bold">DISBURSED TO PHANTOM WALLET</span>
                   )}
                 </div>
               </div>

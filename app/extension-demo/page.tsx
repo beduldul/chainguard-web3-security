@@ -112,7 +112,7 @@ export default function ExtensionDemoPage() {
                   Target Domain  : https://app.uniswap.org (Verified)<br />
                   Method Signature: exactInputSingle(ExactInputSingleParams params)<br />
                   Protocol Router : 0xE592427A0AEce92De3Edee1F18E0157C05861564 (Uniswap V3)<br />
-                  Swap Path       : 1,000.00 USDC ➔ 0.3125 WETH<br />
+                  Swap Path       : 1,000.00 USDC &rarr; 0.3125 WETH<br />
                   Calculated Risk : 0/100 (VERIFIED SAFE)
                 </div>
                 <div className="p-3 bg-[#0a1e12] border border-[#00ff66] text-[#00ff66]">

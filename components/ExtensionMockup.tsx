@@ -89,7 +89,7 @@ export default function ExtensionMockup() {
               <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-200 space-y-1">
                 <div className="flex items-center gap-1.5 font-bold text-xs">
                   <AlertOctagon className="w-4 h-4 text-rose-400" />
-                  <span>{isScam ? '⚠️ HIGH RISK TRANSACTION BLOCKED' : '🟢 TRANSACTION PREVIEW'}</span>
+                  <span>{isScam ? 'HIGH RISK TRANSACTION BLOCKED' : 'TRANSACTION PREVIEW'}</span>
                 </div>
                 <p className="text-[11px] leading-relaxed text-gray-300">
                   {isScam

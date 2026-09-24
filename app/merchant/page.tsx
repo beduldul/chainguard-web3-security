@@ -37,7 +37,7 @@ export default function MerchantPage() {
         </h1>
 
         <p className="text-xs sm:text-sm text-gray-300 max-w-2xl leading-relaxed">
-          Accept crypto payments on your dApp or ecommerce website seamlessly. Customers can pay with any token on Base, Arbitrum, or Ethereum, while you receive 100% stablecoin settlement into your wallet.
+          Accept crypto payments on your dApp or ecommerce website. Customers can pay with any token on Base, Arbitrum, or Ethereum, while you receive 100% stablecoin settlement into your wallet.
         </p>
       </div>
 

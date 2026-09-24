@@ -29,7 +29,7 @@ const securityReport = await guardian.protect({
 });
 
 if (securityReport.riskScore >= 75) {
-  console.warn("⚠️ Transaction blocked by ChainGuard Guardian:", securityReport.aiExplanation);
+  console.warn("Transaction blocked by ChainGuard Guardian:", securityReport.aiExplanation);
   alert(\`Transaction Blocked! Risk Score: \${securityReport.riskScore}/100\`);
 } else {
   // Proceed with wallet signing

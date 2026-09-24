@@ -17,7 +17,7 @@ export interface TxPreset {
 export const PRESET_TRANSACTIONS: TxPreset[] = [
   {
     id: 'unlimited-approval-scam',
-    name: '⚠️ High Risk: Unlimited USDC Approval Scam',
+    name: 'High Risk: Unlimited USDC Approval Scam',
     category: 'SCAM',
     badge: 'CRITICAL RISK (87/100)',
     dappDomain: 'https://uniswap-like.xyz',
@@ -31,7 +31,7 @@ export const PRESET_TRANSACTIONS: TxPreset[] = [
   },
   {
     id: 'legit-uniswap-swap',
-    name: '🟢 Low Risk: Uniswap V3 Token Swap (1,000 USDC → WETH)',
+    name: 'Low Risk: Uniswap V3 Token Swap (1,000 USDC -> WETH)',
     category: 'LEGIT',
     badge: 'SAFE (12/100)',
     dappDomain: 'https://app.uniswap.org',
@@ -44,7 +44,7 @@ export const PRESET_TRANSACTIONS: TxPreset[] = [
   },
   {
     id: 'permit-signature-drainer',
-    name: '🔴 Critical: EIP-712 Permit Signature Drainer',
+    name: 'Critical: EIP-712 Permit Signature Drainer',
     category: 'PERMIT',
     badge: 'CRITICAL DRAINER (94/100)',
     dappDomain: 'https://eth-reward-claim.xyz',
@@ -58,7 +58,7 @@ export const PRESET_TRANSACTIONS: TxPreset[] = [
   },
   {
     id: 'proxy-nft-mint',
-    name: '🟡 Moderate: Unverified Proxy NFT Mint Call',
+    name: 'Moderate: Unverified Proxy NFT Mint Call',
     category: 'PROXY',
     badge: 'MODERATE RISK (58/100)',
     dappDomain: 'https://cyber-pass-mint.io',

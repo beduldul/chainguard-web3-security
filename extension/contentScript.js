@@ -1,5 +1,5 @@
 // ChainGuard Content Script - Injected EVM Provider Interceptor
-console.log('🛡️ ChainGuard Extension Interceptor Active');
+console.log('ChainGuard Extension Interceptor Active');
 
 // Listen for messages from injected page script
 window.addEventListener('message', async (event) => {

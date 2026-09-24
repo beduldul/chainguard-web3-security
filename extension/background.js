@@ -1,6 +1,6 @@
 // ChainGuard Background Service Worker
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('🛡️ ChainGuard Extension Installed Successfully');
+  console.log('ChainGuard Extension Installed Successfully');
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

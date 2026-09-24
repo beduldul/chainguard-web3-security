@@ -109,7 +109,7 @@ export default function TxSimulationCard({ simulation }: TxSimulationCardProps) 
               <span className="text-gray-300">{b.asset}</span>
               <div className="flex items-center gap-3">
                 <span className="text-gray-500 line-through">{b.before}</span>
-                <span className="text-gray-400">➔</span>
+                <span className="text-gray-400">&rarr;</span>
                 <span className={b.isNegative ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}>
                   {b.after}
                 </span>
