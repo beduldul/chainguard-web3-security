@@ -1,34 +1,37 @@
-# ChainGuard — Web3 Security & Multi-Product Startup Suite
+# ChainGuard — Web3 Security & Decentralized Commerce
 
-> **A Web3 security layer, transaction firewall & decentralized commerce infrastructure.**  
-> *Intercepts, simulates, and audits EVM & Solana transactions before wallet signatures.*
-
----
-
-## Ecosystem Overview
-
-**ChainGuard** is an all-in-one Web3 security & decentralized financial platform. It features an onchain transaction firewall, Chrome Manifest V3 interceptor, cross-chain checkout engine, corporate crypto payroll, onchain credit scoring, freelancer escrow, and autonomous AI drainer bot hunter.
+> Intercepts, simulates, and audits EVM & Solana transactions before wallet signatures.
+> Also ships a set of onchain commerce contracts built on Base, Solana, and Ethereum.
 
 ---
 
-## 6 Web3 Startup Platforms Included
+## Overview
+
+ChainGuard is a Next.js application with a companion Chrome Manifest V3 extension.
+It contains an onchain transaction firewall, a cross-chain checkout engine, a
+corporate payroll contract, an onchain credit score, a freelancer escrow, and a
+mempool scanner for drainer activity. Each surface is a route in `app/`.
+
+---
+
+## Modules
 
 1. **ChainGuard Firewall** (`/` & `/wallet-exposure` & `/website-scanner`)
    - Decodes EVM calldata (`approve`, `transfer`, `permit`, `multicall`), traces token state diffs, calculates dynamic 0-100 risk scores, scans token approvals, and audits dApp domains.
-2. **Universal Crypto Checkout (Stripe for Web3)** (`/checkout` & `/merchant`)
+2. **Universal Crypto Checkout** (`/checkout` & `/merchant`)
    - Multi-chain payment router across Solana (Phantom), Base (USDC/ETH), Arbitrum (USDT), and Ethereum. Includes embeddable React payment widget generator.
-3. **Corporate Crypto Payroll Infrastructure** (`/payroll`)
+3. **Corporate Crypto Payroll** (`/payroll`)
    - 1-transaction batch salary disbursal engine, employee roster manager, and automated CSV tax reporting.
 4. **Onchain Credit Score & Identity** (`/credit-score`)
    - Wallet creditworthiness scoring engine (0-100) based on onchain longevity, transaction count, loan repayments, zero liquidations, and average USD balances. Enables 30% collateral discounts in DeFi lending.
-5. **Onchain Freelancer Escrow Protocol** (`/escrow`)
+5. **Onchain Freelancer Escrow** (`/escrow`)
    - Milestone-based escrow contract locking client funds and releasing payouts to freelancer wallets upon milestone verification.
-6. **Autonomous AI Security Agent & Drainer Bot Hunter** (`/ai-agent`)
-   - Autonomous mempool & bytecode scanner detecting fake airdrop drainers, phishing signatures, and honeypot mint calls 24/7. Auto-pushes threats to the global blacklist registry.
+6. **AI Security Agent & Drainer Bot Hunter** (`/ai-agent`)
+   - Mempool & bytecode scanner detecting fake airdrop drainers, phishing signatures, and honeypot mint calls. Auto-pushes threats to the global blacklist registry.
 
 ---
 
-## Smart Contracts & Test Suite
+## Smart Contracts
 
 ```
 contracts/
@@ -47,28 +50,28 @@ contracts/
 
 ---
 
-## Quick Start & Verification Commands
+## Running it
 
-### 1. Run Production Server
+### 1. Production server
 ```bash
 npm run build
 npm run start
 ```
-App runs live at **[http://localhost:3000](http://localhost:3000)**.
+Serves on [http://localhost:3000](http://localhost:3000).
 
-### 2. Run Automated API Integration Tests
+### 2. API integration tests
 ```bash
 node scripts/test-all-apis.mjs
 ```
 
-### 3. Run Solidity Contract Verifier Audit
+### 3. Solidity contract verifier
 ```bash
 node scripts/test-solidity-contracts.mjs
 ```
 
 ---
 
-## Load Chrome Extension (Manifest V3)
+## Chrome extension (Manifest V3)
 
 1. Open Google Chrome / Brave and navigate to `chrome://extensions`.
 2. Enable **Developer mode** in the top right.
@@ -76,5 +79,7 @@ node scripts/test-solidity-contracts.mjs
 
 ---
 
-## License & Open Source
-Distributed under the MIT License. Published on GitHub at **[beduldul/chainguard-web3-security](https://github.com/beduldul/chainguard-web3-security)**.
+## License
+
+Distributed under the MIT License. Source at
+**[beduldul/chainguard-web3-security](https://github.com/beduldul/chainguard-web3-security)**.
