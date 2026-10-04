@@ -218,4 +218,14 @@ contract UniversalCheckoutTest {
         (, uint256 volume, ) = checkout.merchants(merchant);
         require(volume == 1000, "Volume must be credited exactly once");
     }
+
+    function testPayInvoiceRevertsOnNonBooleanReturn() public {
+        NonBooleanERC20 token = new NonBooleanERC20();
+
+        vm.prank(merchant);
+        checkout.registerMerchant(usdcToken);
+
+        vm.expectRevert("Checkout: ERC20 transferFrom failed");
+        checkout.payInvoice(bytes32("inv-008"), merchant, address(token), 1000, 1000);
+    }
 }

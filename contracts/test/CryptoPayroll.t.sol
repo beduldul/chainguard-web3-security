@@ -95,4 +95,44 @@ contract CryptoPayrollTest {
         vm.expectRevert("Payroll: ERC20 transferFrom failed");
         payroll.disburseBatch(bytes32("batch-007"), address(token), _recipients(), _amounts());
     }
+
+    /// @dev FAIL-BEFORE/PASS-AFTER: before the `nonReentrant` guard was added, the
+    /// re-entrant `disburseBatch` call succeeded and paid the recipient a second time.
+    function testDisburseBatchIsReentrancySafe() public {
+        ReentrantERC20 token = new ReentrantERC20();
+        token.mint(address(this), 1_000);
+        token.approve(address(payroll), 1_000);
+        // Fund the mock itself so it can pay for a re-entrant batch if the guard were absent.
+        token.mint(address(token), 1_000);
+        token.selfApprove(address(payroll), 1_000);
+
+        bytes memory payload = abi.encodeWithSignature(
+            "disburseBatch(bytes32,address,address[],uint256[])",
+            bytes32("batch-inner"),
+            address(token),
+            _recipients(),
+            _amounts()
+        );
+        token.configure(address(payroll), payload);
+
+        payroll.disburseBatch(bytes32("batch-outer"), address(token), _recipients(), _amounts());
+
+        require(!token.reentrySucceeded(), "Reentrant disburseBatch must not succeed");
+        require(token.balanceOf(emp1) == 100, "Recipient must be paid exactly once");
+        require(token.balanceOf(address(this)) == 900, "Payer must be debited exactly once");
+    }
+
+    function testDisburseBatchRevertsOnNonBooleanReturn() public {
+        NonBooleanERC20 token = new NonBooleanERC20();
+
+        vm.expectRevert("Payroll: ERC20 transferFrom failed");
+        payroll.disburseBatch(bytes32("batch-008"), address(token), _recipients(), _amounts());
+    }
+
+    function testDisburseBatchRevertsOnOversizedReturn() public {
+        OversizedReturnERC20 token = new OversizedReturnERC20();
+
+        vm.expectRevert("Payroll: ERC20 transferFrom failed");
+        payroll.disburseBatch(bytes32("batch-009"), address(token), _recipients(), _amounts());
+    }
 }

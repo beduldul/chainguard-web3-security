@@ -247,7 +247,7 @@ contract FreelancerEscrow {
         (bool ok, bytes memory data) = token.call(
             abi.encodeWithSelector(IERC20.transfer.selector, to, amount)
         );
-        require(ok && (data.length == 0 || abi.decode(data, (bool))), "Escrow: ERC20 transfer failed");
+        require(ok && _tokenReturnedTrue(data), "Escrow: ERC20 transfer failed");
     }
 
     /**
@@ -257,6 +257,23 @@ contract FreelancerEscrow {
         (bool ok, bytes memory data) = token.call(
             abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, amount)
         );
-        require(ok && (data.length == 0 || abi.decode(data, (bool))), "Escrow: ERC20 transferFrom failed");
+        require(ok && _tokenReturnedTrue(data), "Escrow: ERC20 transferFrom failed");
+    }
+
+    /// @dev True for no data (token returns nothing) or a 32-byte word equal to 1.
+    /// Any other return — `false`, a non-boolean word, or a malformed length — is failure.
+    function _tokenReturnedTrue(bytes memory data) internal pure returns (bool) {
+        if (data.length == 0) {
+            return true;
+        }
+        if (data.length != 32) {
+            return false;
+        }
+        uint256 word;
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            word := mload(add(data, 0x20))
+        }
+        return word == 1;
     }
 }

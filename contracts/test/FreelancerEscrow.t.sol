@@ -453,4 +453,82 @@ contract FreelancerEscrowTest {
         vm.expectRevert("Escrow: milestone not delivered");
         escrow.claimMilestone(jobId, 0);
     }
+
+    /// @dev REGRESSION GUARD (not fail-before): `releaseMilestone` was already safe by
+    /// CEI — `ms.isReleased = true` is written before the transfer — so a re-entrant
+    /// call reverts on "already released" regardless of the guard. The guard is a second
+    /// line of defence; this test pins the safe behaviour.
+    function testReleaseMilestoneIsReentrancySafe() public {
+        ReentrantERC20 token = new ReentrantERC20();
+        token.mint(address(this), 100);
+        token.approve(address(escrow), 100);
+
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 100;
+        escrow.createEscrow(jobId, freelancer, address(token), amounts);
+        vm.prank(freelancer);
+        escrow.acceptEscrow(jobId);
+
+        bytes memory payload = abi.encodeWithSignature("releaseMilestone(bytes32,uint256)", jobId, uint256(0));
+        token.configure(address(escrow), payload);
+
+        escrow.releaseMilestone(jobId, 0);
+
+        require(!token.reentrySucceeded(), "Reentrant releaseMilestone must not succeed");
+        require(token.balanceOf(freelancer) == 100, "Freelancer must be paid exactly once");
+        (, bool released) = escrow.agreementMilestones(jobId, 0);
+        require(released, "Milestone must be released once");
+    }
+
+    /// @dev REGRESSION GUARD (not fail-before): `claimMilestone` shares the CEI
+    /// `_release` path, which sets `ms.isReleased = true` before the transfer, so a
+    /// re-entrant call reverts on "already released" even without the guard. The guard
+    /// is a second line of defence.
+    function testClaimMilestoneIsReentrancySafe() public {
+        ReentrantERC20 token = new ReentrantERC20();
+        token.mint(address(this), 100);
+        token.approve(address(escrow), 100);
+
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 100;
+        escrow.createEscrow(jobId, freelancer, address(token), amounts);
+        vm.prank(freelancer);
+        escrow.acceptEscrow(jobId);
+        vm.prank(freelancer);
+        escrow.markDelivered(jobId, 0);
+        vm.warp(block.timestamp + escrow.DISPUTE_WINDOW());
+
+        bytes memory payload = abi.encodeWithSignature("claimMilestone(bytes32,uint256)", jobId, uint256(0));
+        token.configure(address(escrow), payload);
+
+        vm.prank(freelancer);
+        escrow.claimMilestone(jobId, 0);
+
+        require(!token.reentrySucceeded(), "Reentrant claimMilestone must not succeed");
+        require(token.balanceOf(freelancer) == 100, "Freelancer must be paid exactly once");
+    }
+
+    function testReleaseMilestoneRevertsOnNonBooleanReturn() public {
+        NonBooleanOnTransferERC20 token = new NonBooleanOnTransferERC20();
+        token.mint(address(this), 100);
+        token.approve(address(escrow), 100);
+
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 100;
+        escrow.createEscrow(jobId, freelancer, address(token), amounts);
+        vm.prank(freelancer);
+        escrow.acceptEscrow(jobId);
+
+        vm.expectRevert("Escrow: ERC20 transfer failed");
+        escrow.releaseMilestone(jobId, 0);
+    }
+
+    function testCreateEscrowRevertsOnNonBooleanReturn() public {
+        NonBooleanERC20 token = new NonBooleanERC20();
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 100;
+
+        vm.expectRevert("Escrow: ERC20 transferFrom failed");
+        escrow.createEscrow(jobId, freelancer, address(token), amounts);
+    }
 }

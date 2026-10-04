@@ -32,6 +32,7 @@ contract RecurringBilling {
     event SubscriptionBilled(bytes32 indexed subId, uint256 timestamp);
     event SubscriptionCancelled(bytes32 indexed subId);
     event MaxPullsUpdated(bytes32 indexed subId, uint256 maxPulls);
+    event SubscriptionUpdated(bytes32 indexed subId, uint256 amountUsdc, uint256 intervalSeconds);
 
     // Hand-rolled reentrancy guard (no forge-std / OZ dependency). 1 = unlocked, 2 = entered.
     uint256 private _reentrancyStatus = 1;
@@ -101,6 +102,28 @@ contract RecurringBilling {
         emit MaxPullsUpdated(subId, maxPulls);
     }
 
+    /**
+     * @dev Updates the amount and/or interval of a live subscription. Only the subscriber
+     * may call it, and the subscription must exist and still be active. The change takes
+     * effect on the NEXT pull: `lastBilledAt` is left untouched, so an already-charged
+     * period is never retroactively repriced and the interval clock is not reset.
+     *
+     * The merchant and token are immutable — repointing them would let a subscriber
+     * redirect a merchant's future revenue stream, so that is deliberately not supported.
+     */
+    function updateSubscription(bytes32 subId, uint256 newAmountUsdc, uint256 newIntervalSeconds) external {
+        Subscription storage sub = subscriptions[subId];
+        require(sub.subscriber == msg.sender, "RecurringBilling: caller is not subscriber");
+        require(sub.isActive, "RecurringBilling: subscription is not active");
+        require(newAmountUsdc > 0, "RecurringBilling: amount must be positive");
+        require(newIntervalSeconds > 0, "RecurringBilling: interval must be positive");
+
+        sub.amountUsdc = newAmountUsdc;
+        sub.intervalSeconds = newIntervalSeconds;
+
+        emit SubscriptionUpdated(subId, newAmountUsdc, newIntervalSeconds);
+    }
+
     function cancelSubscription(bytes32 subId) external {
         Subscription storage sub = subscriptions[subId];
         require(sub.subscriber == msg.sender, "RecurringBilling: caller is not subscriber");
@@ -117,6 +140,23 @@ contract RecurringBilling {
         (bool ok, bytes memory data) = token.call(
             abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, amount)
         );
-        require(ok && (data.length == 0 || abi.decode(data, (bool))), "RecurringBilling: ERC20 transferFrom failed");
+        require(ok && _tokenReturnedTrue(data), "RecurringBilling: ERC20 transferFrom failed");
+    }
+
+    /// @dev True for no data (token returns nothing) or a 32-byte word equal to 1.
+    /// Any other return — `false`, a non-boolean word, or a malformed length — is failure.
+    function _tokenReturnedTrue(bytes memory data) internal pure returns (bool) {
+        if (data.length == 0) {
+            return true;
+        }
+        if (data.length != 32) {
+            return false;
+        }
+        uint256 word;
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            word := mload(add(data, 0x20))
+        }
+        return word == 1;
     }
 }

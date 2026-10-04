@@ -20,6 +20,16 @@ contract CryptoPayroll {
         uint256 recipientsCount
     );
 
+    // Hand-rolled reentrancy guard (no forge-std / OZ dependency). 1 = unlocked, 2 = entered.
+    uint256 private _reentrancyStatus = 1;
+
+    modifier nonReentrant() {
+        require(_reentrancyStatus == 1, "Payroll: reentrant call");
+        _reentrancyStatus = 2;
+        _;
+        _reentrancyStatus = 1;
+    }
+
     constructor() {
         owner = msg.sender;
     }
@@ -29,7 +39,7 @@ contract CryptoPayroll {
         address token,
         address[] calldata recipients,
         uint256[] calldata amounts
-    ) external payable {
+    ) external payable nonReentrant {
         require(recipients.length == amounts.length, "Payroll: length mismatch");
         require(recipients.length > 0, "Payroll: no recipients");
 
@@ -60,6 +70,23 @@ contract CryptoPayroll {
         (bool ok, bytes memory data) = token.call(
             abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, amount)
         );
-        require(ok && (data.length == 0 || abi.decode(data, (bool))), "Payroll: ERC20 transferFrom failed");
+        require(ok && _tokenReturnedTrue(data), "Payroll: ERC20 transferFrom failed");
+    }
+
+    /// @dev True for no data (token returns nothing) or a 32-byte word equal to 1.
+    /// Any other return — `false`, a non-boolean word, or a malformed length — is failure.
+    function _tokenReturnedTrue(bytes memory data) internal pure returns (bool) {
+        if (data.length == 0) {
+            return true;
+        }
+        if (data.length != 32) {
+            return false;
+        }
+        uint256 word;
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            word := mload(add(data, 0x20))
+        }
+        return word == 1;
     }
 }

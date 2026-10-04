@@ -363,4 +363,23 @@ contract GitHubBountyTest {
         vm.expectRevert("GitHubBounty: only issuer");
         bountyContract.cancelBounty(bountyId);
     }
+
+    function testCreateBountyRevertsOnNonBooleanReturn() public {
+        NonBooleanERC20 bad = new NonBooleanERC20();
+
+        vm.expectRevert("GitHubBounty: ERC20 transferFrom failed");
+        bountyContract.createBounty(bountyId, issueUrl, address(bad), reward);
+    }
+
+    function testReleaseBountyRevertsOnNonBooleanReturn() public {
+        NonBooleanOnTransferERC20 bad = new NonBooleanOnTransferERC20();
+        bad.mint(address(this), reward);
+        bad.approve(address(bountyContract), reward);
+
+        bountyContract.createBounty(bountyId, issueUrl, address(bad), reward);
+        bountyContract.claimBounty(bountyId, solver);
+
+        vm.expectRevert("GitHubBounty: ERC20 transfer failed");
+        bountyContract.releaseBounty(bountyId);
+    }
 }

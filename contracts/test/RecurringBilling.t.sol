@@ -17,6 +17,7 @@ contract RecurringBillingTest {
     event SubscriptionBilled(bytes32 indexed subId, uint256 timestamp);
     event SubscriptionCancelled(bytes32 indexed subId);
     event MaxPullsUpdated(bytes32 indexed subId, uint256 maxPulls);
+    event SubscriptionUpdated(bytes32 indexed subId, uint256 amountUsdc, uint256 intervalSeconds);
 
     function setUp() public {
         billing = new RecurringBilling();
@@ -269,5 +270,89 @@ contract RecurringBillingTest {
         billing.processBilling(subId);
 
         require(token.balanceOf(merchant) == 200, "Zero cap must restore unlimited pulls");
+    }
+
+    function testProcessBillingRevertsOnNonBooleanReturn() public {
+        NonBooleanERC20 bad = new NonBooleanERC20();
+        billing.createSubscription(subId, merchant, address(bad), 100, 30 days);
+
+        vm.warp(vm.getBlockTimestamp() + 30 days);
+
+        vm.expectRevert("RecurringBilling: ERC20 transferFrom failed");
+        billing.processBilling(subId);
+    }
+
+    function testUpdateSubscriptionChangesAmountAndInterval() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+
+        vm.expectEmit(true, false, false, true);
+        emit SubscriptionUpdated(subId, 250, 15 days);
+        billing.updateSubscription(subId, 250, 15 days);
+
+        (, , , uint256 amount, uint256 interval, , , , ) = billing.subscriptions(subId);
+        require(amount == 250, "Amount not updated");
+        require(interval == 15 days, "Interval not updated");
+    }
+
+    function testUpdateSubscriptionRevertsForNonSubscriber() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+
+        vm.prank(stranger);
+        vm.expectRevert("RecurringBilling: caller is not subscriber");
+        billing.updateSubscription(subId, 250, 15 days);
+
+        (, , , uint256 amount, , , , , ) = billing.subscriptions(subId);
+        require(amount == 100, "Unauthorized update must not persist");
+    }
+
+    function testUpdateSubscriptionRevertsForZeroAmount() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+
+        vm.expectRevert("RecurringBilling: amount must be positive");
+        billing.updateSubscription(subId, 0, 15 days);
+    }
+
+    function testUpdateSubscriptionRevertsForZeroInterval() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+
+        vm.expectRevert("RecurringBilling: interval must be positive");
+        billing.updateSubscription(subId, 250, 0);
+    }
+
+    function testUpdateSubscriptionRevertsAfterCancel() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+        billing.cancelSubscription(subId);
+
+        vm.expectRevert("RecurringBilling: subscription is not active");
+        billing.updateSubscription(subId, 250, 15 days);
+    }
+
+    /// @dev The change must apply to the NEXT pull only: the already-charged period keeps
+    /// the old price, `lastBilledAt` is not reset, and the following pull charges the new
+    /// amount after the NEW interval elapses.
+    function testUpdateSubscriptionAppliesOnNextPullWithoutCorruptingClock() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+        uint256 t0 = vm.getBlockTimestamp();
+
+        // Period 1 is charged at the old amount.
+        vm.warp(t0 + 30 days);
+        billing.processBilling(subId);
+        require(token.balanceOf(merchant) == 100, "First pull must charge the old amount");
+
+        billing.updateSubscription(subId, 250, 15 days);
+
+        // The clock must not be reset by the update.
+        (, , , , , uint256 lastBilledAt, , , ) = billing.subscriptions(subId);
+        require(lastBilledAt == t0 + 30 days, "Update must not reset the period clock");
+
+        // The new (shorter) interval has not elapsed yet.
+        vm.expectRevert("RecurringBilling: interval has not elapsed");
+        billing.processBilling(subId);
+
+        // After the new interval elapses, the pull charges the NEW amount, not the old one.
+        vm.warp(t0 + 30 days + 15 days);
+        billing.processBilling(subId);
+
+        require(token.balanceOf(merchant) == 100 + 250, "Next pull must charge the new amount");
     }
 }

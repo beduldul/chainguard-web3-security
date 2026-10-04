@@ -252,4 +252,26 @@ contract OnchainCreditScoreTest {
         require(repayments == 0, "Repayments mismatch");
         require(issuedAt == 0, "Issued-at mismatch");
     }
+
+    function testStakeCollateralRevertsOnNonBooleanReturn() public {
+        NonBooleanERC20 bad = new NonBooleanERC20();
+
+        vm.prank(userWallet);
+        vm.expectRevert("CreditScore: ERC20 transferFrom failed");
+        creditScore.stakeCollateral(address(bad), 100);
+    }
+
+    function testWithdrawCollateralRevertsOnNonBooleanReturn() public {
+        NonBooleanOnTransferERC20 bad = new NonBooleanOnTransferERC20();
+        bad.mint(userWallet, 100);
+        vm.prank(userWallet);
+        bad.approve(address(creditScore), 100);
+
+        vm.prank(userWallet);
+        creditScore.stakeCollateral(address(bad), 100);
+
+        vm.prank(userWallet);
+        vm.expectRevert("CreditScore: ERC20 transfer failed");
+        creditScore.withdrawCollateral();
+    }
 }
