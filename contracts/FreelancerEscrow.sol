@@ -36,6 +36,9 @@ contract FreelancerEscrow {
         address token,
         uint256[] calldata milestoneAmounts
     ) external payable {
+        require(agreements[jobId].client == address(0), "Escrow: job already exists");
+        require(freelancer != address(0), "Escrow: invalid freelancer");
+
         uint256 total = 0;
         for (uint256 i = 0; i < milestoneAmounts.length; i++) {
             total += milestoneAmounts[i];
@@ -56,7 +59,7 @@ contract FreelancerEscrow {
         if (token == address(0)) {
             require(msg.value == total, "Escrow: incorrect ETH value");
         } else {
-            IERC20(token).transferFrom(msg.sender, address(this), total);
+            _safeTransferFrom(token, msg.sender, address(this), total);
         }
 
         emit EscrowCreated(jobId, msg.sender, freelancer, total);
@@ -74,9 +77,30 @@ contract FreelancerEscrow {
         if (agreement.token == address(0)) {
             payable(agreement.freelancer).transfer(ms.amountUsd);
         } else {
-            IERC20(agreement.token).transfer(agreement.freelancer, ms.amountUsd);
+            _safeTransfer(agreement.token, agreement.freelancer, ms.amountUsd);
         }
 
         emit MilestoneReleased(jobId, milestoneIndex, ms.amountUsd);
+    }
+
+    /**
+     * @dev ERC20 `transfer` that reverts unless the token reports success.
+     * Handles both boolean-returning tokens and tokens that return no data.
+     */
+    function _safeTransfer(address token, address to, uint256 amount) internal {
+        (bool ok, bytes memory data) = token.call(
+            abi.encodeWithSelector(IERC20.transfer.selector, to, amount)
+        );
+        require(ok && (data.length == 0 || abi.decode(data, (bool))), "Escrow: ERC20 transfer failed");
+    }
+
+    /**
+     * @dev ERC20 `transferFrom` that reverts unless the token reports success.
+     */
+    function _safeTransferFrom(address token, address from, address to, uint256 amount) internal {
+        (bool ok, bytes memory data) = token.call(
+            abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, amount)
+        );
+        require(ok && (data.length == 0 || abi.decode(data, (bool))), "Escrow: ERC20 transferFrom failed");
     }
 }

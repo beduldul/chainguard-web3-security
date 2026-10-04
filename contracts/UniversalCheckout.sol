@@ -50,13 +50,14 @@ contract UniversalCheckout {
         uint256 inputAmount,
         uint256 expectedPayoutUsd
     ) external payable {
+        require(merchant != address(0), "Checkout: invalid merchant");
         require(merchants[merchant].isActive, "Checkout: merchant not registered");
 
         if (inputToken == address(0)) {
             require(msg.value == inputAmount, "Checkout: incorrect ETH value");
             payable(merchant).transfer(msg.value);
         } else {
-            IERC20(inputToken).transferFrom(msg.sender, merchant, inputAmount);
+            _safeTransferFrom(inputToken, msg.sender, merchant, inputAmount);
         }
 
         merchants[merchant].totalVolumeUsd += expectedPayoutUsd;
@@ -69,5 +70,16 @@ contract UniversalCheckout {
             inputAmount,
             expectedPayoutUsd
         );
+    }
+
+    /**
+     * @dev ERC20 `transferFrom` that reverts unless the token reports success.
+     * Handles both boolean-returning tokens and tokens that return no data.
+     */
+    function _safeTransferFrom(address token, address from, address to, uint256 amount) internal {
+        (bool ok, bytes memory data) = token.call(
+            abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, amount)
+        );
+        require(ok && (data.length == 0 || abi.decode(data, (bool))), "Checkout: ERC20 transferFrom failed");
     }
 }

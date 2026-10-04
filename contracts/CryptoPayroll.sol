@@ -44,12 +44,22 @@ contract CryptoPayroll {
                 payable(recipients[i]).transfer(amounts[i]);
             }
         } else {
-            IERC20 erc20 = IERC20(token);
             for (uint256 i = 0; i < recipients.length; i++) {
-                erc20.transferFrom(msg.sender, recipients[i], amounts[i]);
+                _safeTransferFrom(token, msg.sender, recipients[i], amounts[i]);
             }
         }
 
         emit BatchDisbursed(batchId, token, total, recipients.length);
+    }
+
+    /**
+     * @dev ERC20 `transferFrom` that reverts unless the token reports success.
+     * Handles both boolean-returning tokens and tokens that return no data.
+     */
+    function _safeTransferFrom(address token, address from, address to, uint256 amount) internal {
+        (bool ok, bytes memory data) = token.call(
+            abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, amount)
+        );
+        require(ok && (data.length == 0 || abi.decode(data, (bool))), "Payroll: ERC20 transferFrom failed");
     }
 }
