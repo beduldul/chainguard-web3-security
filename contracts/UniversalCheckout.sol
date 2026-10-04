@@ -36,6 +36,16 @@ contract UniversalCheckout {
     event FeeBpsUpdated(uint256 feeBps);
     event FeeRecipientUpdated(address indexed feeRecipient);
 
+    // Hand-rolled reentrancy guard (no forge-std / OZ dependency). 1 = unlocked, 2 = entered.
+    uint256 private _reentrancyStatus = 1;
+
+    modifier nonReentrant() {
+        require(_reentrancyStatus == 1, "Checkout: reentrant call");
+        _reentrancyStatus = 2;
+        _;
+        _reentrancyStatus = 1;
+    }
+
     modifier onlyOwner() {
         require(msg.sender == owner, "Checkout: caller is not owner");
         _;
@@ -90,25 +100,19 @@ contract UniversalCheckout {
         address inputToken,
         uint256 inputAmount,
         uint256 expectedPayoutUsd
-    ) external payable {
+    ) external payable nonReentrant {
         require(merchant != address(0), "Checkout: invalid merchant");
         require(merchants[merchant].isActive, "Checkout: merchant not registered");
 
-        (uint256 feeAmount, uint256 merchantAmount) = _splitFee(inputAmount);
-
+        // Checks.
         if (inputToken == address(0)) {
             require(msg.value == inputAmount, "Checkout: incorrect ETH value");
-            payable(merchant).transfer(merchantAmount);
-            if (feeAmount > 0) {
-                payable(feeRecipient).transfer(feeAmount);
-            }
-        } else {
-            _safeTransferFrom(inputToken, msg.sender, merchant, merchantAmount);
-            if (feeAmount > 0) {
-                _safeTransferFrom(inputToken, msg.sender, feeRecipient, feeAmount);
-            }
         }
 
+        (uint256 feeAmount, uint256 merchantAmount) = _splitFee(inputAmount);
+
+        // Effects: all accounting is written and the event is emitted BEFORE any external
+        // call, so a re-entrant callee can never observe or exploit stale accounting.
         merchants[merchant].totalVolumeUsd += expectedPayoutUsd;
 
         emit PaymentProcessed(
@@ -119,6 +123,19 @@ contract UniversalCheckout {
             inputAmount,
             expectedPayoutUsd
         );
+
+        // Interactions.
+        if (inputToken == address(0)) {
+            payable(merchant).transfer(merchantAmount);
+            if (feeAmount > 0) {
+                payable(feeRecipient).transfer(feeAmount);
+            }
+        } else {
+            _safeTransferFrom(inputToken, msg.sender, merchant, merchantAmount);
+            if (feeAmount > 0) {
+                _safeTransferFrom(inputToken, msg.sender, feeRecipient, feeAmount);
+            }
+        }
     }
 
     /**

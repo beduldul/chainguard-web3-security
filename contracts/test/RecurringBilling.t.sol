@@ -140,6 +140,26 @@ contract RecurringBillingTest {
         billing.processBilling(subId);
     }
 
+    function testProcessBillingIsReentrancySafe() public {
+        ReentrantERC20 reentrantToken = new ReentrantERC20();
+        reentrantToken.mint(address(this), 1_000_000);
+        reentrantToken.approve(address(billing), 1_000_000);
+        reentrantToken.mint(address(reentrantToken), 1_000_000);
+        reentrantToken.selfApprove(address(billing), 1_000_000);
+
+        billing.createSubscription(subId, merchant, address(reentrantToken), 100, 30 days);
+        uint256 nextBillAt = vm.getBlockTimestamp() + 30 days;
+        vm.warp(nextBillAt);
+
+        bytes memory payload = abi.encodeWithSignature("processBilling(bytes32)", subId);
+        reentrantToken.configure(address(billing), payload);
+
+        billing.processBilling(subId);
+
+        require(reentrantToken.reentrySucceeded() == false, "Reentrant processBilling must not succeed");
+        require(reentrantToken.balanceOf(merchant) == 100, "Merchant must be paid exactly once");
+    }
+
     function testCancelSubscriptionEmitsAndDeactivates() public {
         billing.createSubscription(subId, merchant, address(token), 100, 30 days);
 

@@ -25,26 +25,24 @@ Tests live in `contracts/test/`. They are intentionally **dependency-free** — 
 | `FreelancerEscrow.sol` | Milestone-based fund locking with client-approved release. | yes — 16 tests |
 | `GitHubBounty.sol` | USDC bounties locked to GitHub PR merges. | yes — 8 tests |
 | `OnchainCreditScore.sol` | Verifiable credit ratings + loan collateral discounts. | yes — 8 tests |
-| `RecurringBilling.sol` | Onchain subscription allowances and merchant pulls. | yes — 14 tests |
-| `UniversalCheckout.sol` | Multi-token payment routing + merchant stablecoin settlement. | yes — 17 tests |
+| `RecurringBilling.sol` | Onchain subscription allowances and merchant pulls. | yes — 15 tests |
+| `UniversalCheckout.sol` | Multi-token payment routing + merchant stablecoin settlement. | yes — 18 tests |
 
 ## Measured counts
 
 ```
-Ran 8 test suites: 89 tests passed, 0 failed, 0 skipped (89 total tests)
+Ran 8 test suites: 91 tests passed, 0 failed, 0 skipped (91 total tests)
 ```
 
 Baseline before the `FreelancerEscrow` / `AIAgentRegistry` work: **6 tests**.
 Before the fee / completion / billing / access-control work: **37 tests**.
+Before the checks-effects-interactions + reentrancy work: **89 tests**.
 
 ## Known uncovered behaviour (honest gaps)
 
-- No reentrancy tests exist for any contract.
-- `UniversalCheckout` does not follow checks-effects-interactions: `merchants[...]
-  .totalVolumeUsd` is updated *after* the token/ETH external call and
-  `PaymentProcessed` is emitted after it too (forge flags `reentrancy-no-eth`
-  and `reentrancy-events`). The fee split itself is exact, but the accounting
-  should be moved before the transfer.
+- Reentrancy tests exist only for `UniversalCheckout` and `RecurringBilling`.
+  `CryptoPayroll` and `FreelancerEscrow` still make external calls with no
+  reentrancy test.
 - `GitHubBounty` and `OnchainCreditScore` never move funds: a bounty reward and
   a credit credential are stored metadata only. There is no token escrow or
   payout path in either contract.

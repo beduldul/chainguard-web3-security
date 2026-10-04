@@ -189,4 +189,33 @@ contract UniversalCheckoutTest {
         vm.expectRevert("Checkout: ERC20 transferFrom failed");
         checkout.payInvoice(bytes32("inv-007"), address(this), address(token), 1000, 1000);
     }
+
+    function testPayInvoiceIsReentrancySafe() public {
+        ReentrantERC20 token = new ReentrantERC20();
+        token.mint(address(this), 1_000_000);
+        token.approve(address(checkout), 1_000_000);
+        // Fund the token so it can pay for a re-entrant invoice itself.
+        token.mint(address(token), 1_000_000);
+        token.selfApprove(address(checkout), 1_000_000);
+
+        vm.prank(merchant);
+        checkout.registerMerchant(usdcToken);
+
+        bytes32 invoiceId = bytes32("inv-reentrant");
+        bytes memory payload = abi.encodeWithSignature(
+            "payInvoice(bytes32,address,address,uint256,uint256)",
+            bytes32("inv-inner"),
+            merchant,
+            address(token),
+            1000,
+            1000
+        );
+        token.configure(address(checkout), payload);
+
+        checkout.payInvoice(invoiceId, merchant, address(token), 1000, 1000);
+
+        require(token.reentrySucceeded() == false, "Reentrant payInvoice must not succeed");
+        (, uint256 volume, ) = checkout.merchants(merchant);
+        require(volume == 1000, "Volume must be credited exactly once");
+    }
 }

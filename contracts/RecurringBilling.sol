@@ -30,6 +30,16 @@ contract RecurringBilling {
     event SubscriptionBilled(bytes32 indexed subId, uint256 timestamp);
     event SubscriptionCancelled(bytes32 indexed subId);
 
+    // Hand-rolled reentrancy guard (no forge-std / OZ dependency). 1 = unlocked, 2 = entered.
+    uint256 private _reentrancyStatus = 1;
+
+    modifier nonReentrant() {
+        require(_reentrancyStatus == 1, "RecurringBilling: reentrant call");
+        _reentrancyStatus = 2;
+        _;
+        _reentrancyStatus = 1;
+    }
+
     function createSubscription(
         bytes32 subId,
         address merchant,
@@ -55,16 +65,18 @@ contract RecurringBilling {
         emit SubscriptionCreated(subId, msg.sender, merchant, amountUsdc);
     }
 
-    function processBilling(bytes32 subId) external {
+    function processBilling(bytes32 subId) external nonReentrant {
         Subscription storage sub = subscriptions[subId];
         require(sub.isActive, "RecurringBilling: subscription is not active");
         require(block.timestamp >= sub.lastBilledAt + sub.intervalSeconds, "RecurringBilling: interval has not elapsed");
 
+        // Effects before interactions: advancing the timestamp first means a re-entrant
+        // caller would hit "interval has not elapsed" rather than double-billing the period.
         sub.lastBilledAt = block.timestamp;
 
-        _safeTransferFrom(sub.token, sub.subscriber, sub.merchant, sub.amountUsdc);
-
         emit SubscriptionBilled(subId, block.timestamp);
+
+        _safeTransferFrom(sub.token, sub.subscriber, sub.merchant, sub.amountUsdc);
     }
 
     function cancelSubscription(bytes32 subId) external {
