@@ -10,9 +10,21 @@ contract UniversalCheckoutTest {
     UniversalCheckout public checkout;
     address public merchant = address(0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045);
     address public usdcToken = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+    address public feeRecipient = address(uint160(0xFEE));
+
+    event PaymentProcessed(
+        bytes32 indexed invoiceId,
+        address indexed merchant,
+        address indexed payer,
+        address inputToken,
+        uint256 inputAmount,
+        uint256 merchantPayoutUsd
+    );
+    event FeeBpsUpdated(uint256 feeBps);
+    event FeeRecipientUpdated(address indexed feeRecipient);
 
     function setUp() public {
-        checkout = new UniversalCheckout();
+        checkout = new UniversalCheckout(feeRecipient);
     }
 
     receive() external payable {}
@@ -26,16 +38,25 @@ contract UniversalCheckoutTest {
         require(active == true, "Active mismatch");
     }
 
+    function testConstructorRevertsOnZeroFeeRecipient() public {
+        vm.expectRevert("Checkout: invalid fee recipient");
+        new UniversalCheckout(address(0));
+    }
+
     function testPayInvoiceEthTransfersAndAccruesVolume() public payable {
         vm.prank(merchant);
         checkout.registerMerchant(usdcToken);
         bytes32 invoiceId = bytes32("inv-001");
 
+        vm.expectEmit(true, true, true, true);
+        emit PaymentProcessed(invoiceId, merchant, address(this), address(0), 500, 500);
         checkout.payInvoice{value: 500}(invoiceId, merchant, address(0), 500, 500);
 
         (, uint256 volume, ) = checkout.merchants(merchant);
         require(volume == 500, "Volume mismatch");
-        require(merchant.balance == 500, "Merchant not paid");
+        // feeBps = 25 => fee = 500 * 25 / 10000 = 1 (rounded down); merchant keeps 499.
+        require(merchant.balance == 499, "Merchant not paid net of fee");
+        require(feeRecipient.balance == 1, "Fee recipient not paid");
         require(address(checkout).balance == 0, "Checkout should hold no ETH");
     }
 
@@ -70,10 +91,87 @@ contract UniversalCheckoutTest {
 
         checkout.payInvoice(bytes32("inv-005"), merchant, address(token), 1000, 1000);
 
-        require(token.balanceOf(merchant) == 1000, "Merchant not paid");
+        // 1000 * 25 / 10000 = 2 fee; merchant gets 998.
+        require(token.balanceOf(merchant) == 998, "Merchant not paid net of fee");
+        require(token.balanceOf(feeRecipient) == 2, "Fee recipient not paid");
         require(token.balanceOf(address(this)) == 0, "Payer not debited");
         (, uint256 volume, ) = checkout.merchants(merchant);
         require(volume == 1000, "Volume mismatch");
+    }
+
+    function testPayInvoiceFeeRoundsInFavourOfMerchant() public {
+        MockERC20 token = new MockERC20();
+        token.mint(address(this), 199);
+        token.approve(address(checkout), 199);
+
+        vm.prank(merchant);
+        checkout.registerMerchant(usdcToken);
+
+        // 199 * 25 / 10000 = 0 (0.4975 rounds down) => merchant keeps the full 199.
+        checkout.payInvoice(bytes32("inv-round"), merchant, address(token), 199, 199);
+
+        require(token.balanceOf(merchant) == 199, "Remainder must stay with merchant");
+        require(token.balanceOf(feeRecipient) == 0, "Fee must round down to zero");
+    }
+
+    function testPayInvoiceZeroFeeForwardsFullAmount() public {
+        MockERC20 token = new MockERC20();
+        token.mint(address(this), 1000);
+        token.approve(address(checkout), 1000);
+
+        checkout.setFeeBps(0);
+
+        vm.prank(merchant);
+        checkout.registerMerchant(usdcToken);
+
+        checkout.payInvoice(bytes32("inv-zero"), merchant, address(token), 1000, 1000);
+
+        require(token.balanceOf(merchant) == 1000, "Merchant must receive full amount at zero fee");
+        require(token.balanceOf(feeRecipient) == 0, "No fee expected at zero fee");
+    }
+
+    function testSetFeeBpsUpdatesAndEmits() public {
+        vm.expectEmit(false, false, false, true);
+        emit FeeBpsUpdated(100);
+        checkout.setFeeBps(100);
+
+        require(checkout.feeBps() == 100, "Fee not updated");
+    }
+
+    function testSetFeeBpsRevertsAboveCap() public {
+        vm.expectRevert("Checkout: fee too high");
+        checkout.setFeeBps(1001);
+    }
+
+    function testSetFeeBpsRevertsForNonOwner() public {
+        vm.prank(merchant);
+        vm.expectRevert("Checkout: caller is not owner");
+        checkout.setFeeBps(100);
+
+        require(checkout.feeBps() == 25, "Unauthorized fee change must not persist");
+    }
+
+    function testSetFeeRecipientUpdatesAndEmits() public {
+        address newRecipient = address(uint160(0xCAFE));
+
+        vm.expectEmit(true, false, false, false);
+        emit FeeRecipientUpdated(newRecipient);
+        checkout.setFeeRecipient(newRecipient);
+
+        require(checkout.feeRecipient() == newRecipient, "Recipient not updated");
+    }
+
+    function testSetFeeRecipientRevertsForZeroAddress() public {
+        vm.expectRevert("Checkout: invalid fee recipient");
+        checkout.setFeeRecipient(address(0));
+    }
+
+    function testSetFeeRecipientRevertsForNonOwner() public {
+        vm.prank(merchant);
+        vm.expectRevert("Checkout: caller is not owner");
+        checkout.setFeeRecipient(address(uint160(0xCAFE)));
+
+        require(checkout.feeRecipient() == feeRecipient, "Unauthorized recipient change must not persist");
     }
 
     function testPayInvoiceRevertsWhenErc20ReturnsFalse() public {

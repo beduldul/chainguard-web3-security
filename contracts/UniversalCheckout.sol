@@ -12,7 +12,9 @@ interface IERC20 {
  */
 contract UniversalCheckout {
     address public owner;
-    uint256 public feeBps = 25; // 0.25% protocol fee
+    address public feeRecipient;
+    uint256 public feeBps = 25; // 0.25% protocol fee, charged on the merchant payout
+    uint256 public constant MAX_FEE_BPS = 1000; // 10% hard cap
 
     struct MerchantAccount {
         address preferredStablecoin;
@@ -31,8 +33,37 @@ contract UniversalCheckout {
         uint256 merchantPayoutUsd
     );
 
-    constructor() {
+    event FeeBpsUpdated(uint256 feeBps);
+    event FeeRecipientUpdated(address indexed feeRecipient);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Checkout: caller is not owner");
+        _;
+    }
+
+    constructor(address feeRecipient_) {
+        require(feeRecipient_ != address(0), "Checkout: invalid fee recipient");
         owner = msg.sender;
+        feeRecipient = feeRecipient_;
+    }
+
+    /**
+     * @dev Updates the protocol fee. Capped at `MAX_FEE_BPS` so the merchant payout cannot be
+     * silently drained by an owner key compromise.
+     */
+    function setFeeBps(uint256 newFeeBps) external onlyOwner {
+        require(newFeeBps <= MAX_FEE_BPS, "Checkout: fee too high");
+        feeBps = newFeeBps;
+        emit FeeBpsUpdated(newFeeBps);
+    }
+
+    /**
+     * @dev Updates the fee sink. A zero recipient would strand fees, so it is rejected.
+     */
+    function setFeeRecipient(address newFeeRecipient) external onlyOwner {
+        require(newFeeRecipient != address(0), "Checkout: invalid fee recipient");
+        feeRecipient = newFeeRecipient;
+        emit FeeRecipientUpdated(newFeeRecipient);
     }
 
     function registerMerchant(address preferredStablecoin) external {
@@ -41,6 +72,16 @@ contract UniversalCheckout {
             totalVolumeUsd: 0,
             isActive: true
         });
+    }
+
+    /**
+     * @dev Splits `inputAmount` into a protocol fee and a merchant payout.
+     * Integer division rounds the fee **down**, so any remainder is left with the merchant
+     * (rounding in favour of the merchant). The fee is 0 whenever `inputAmount * feeBps < 10_000`.
+     */
+    function _splitFee(uint256 inputAmount) internal view returns (uint256 feeAmount, uint256 merchantAmount) {
+        feeAmount = (inputAmount * feeBps) / 10_000;
+        merchantAmount = inputAmount - feeAmount;
     }
 
     function payInvoice(
@@ -53,11 +94,19 @@ contract UniversalCheckout {
         require(merchant != address(0), "Checkout: invalid merchant");
         require(merchants[merchant].isActive, "Checkout: merchant not registered");
 
+        (uint256 feeAmount, uint256 merchantAmount) = _splitFee(inputAmount);
+
         if (inputToken == address(0)) {
             require(msg.value == inputAmount, "Checkout: incorrect ETH value");
-            payable(merchant).transfer(msg.value);
+            payable(merchant).transfer(merchantAmount);
+            if (feeAmount > 0) {
+                payable(feeRecipient).transfer(feeAmount);
+            }
         } else {
-            _safeTransferFrom(inputToken, msg.sender, merchant, inputAmount);
+            _safeTransferFrom(inputToken, msg.sender, merchant, merchantAmount);
+            if (feeAmount > 0) {
+                _safeTransferFrom(inputToken, msg.sender, feeRecipient, feeAmount);
+            }
         }
 
         merchants[merchant].totalVolumeUsd += expectedPayoutUsd;

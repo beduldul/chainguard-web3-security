@@ -59,6 +59,7 @@ contract FreelancerEscrow {
         if (token == address(0)) {
             require(msg.value == total, "Escrow: incorrect ETH value");
         } else {
+            require(msg.value == 0, "Escrow: ETH not accepted for token escrow");
             _safeTransferFrom(token, msg.sender, address(this), total);
         }
 
@@ -74,6 +75,9 @@ contract FreelancerEscrow {
 
         ms.isReleased = true;
 
+        // The agreement is complete only once every milestone has been released.
+        agreement.isCompleted = _allMilestonesReleased(jobId);
+
         if (agreement.token == address(0)) {
             payable(agreement.freelancer).transfer(ms.amountUsd);
         } else {
@@ -81,6 +85,23 @@ contract FreelancerEscrow {
         }
 
         emit MilestoneReleased(jobId, milestoneIndex, ms.amountUsd);
+    }
+
+    /**
+     * @dev True when the agreement holds at least one milestone and every one is released.
+     * An agreement with no milestones is never considered completed (there is no release path).
+     */
+    function _allMilestonesReleased(bytes32 jobId) internal view returns (bool) {
+        Milestone[] storage milestones = agreementMilestones[jobId];
+        if (milestones.length == 0) {
+            return false;
+        }
+        for (uint256 i = 0; i < milestones.length; i++) {
+            if (!milestones[i].isReleased) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

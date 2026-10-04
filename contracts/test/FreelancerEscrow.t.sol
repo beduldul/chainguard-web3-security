@@ -147,4 +147,69 @@ contract FreelancerEscrowTest {
         vm.expectRevert("Escrow: ERC20 transfer failed");
         escrow.releaseMilestone(jobId, 0);
     }
+
+    function testAgreementNotCompletedWhileMilestoneOutstanding() public {
+        uint256[] memory amounts = _twoMilestones();
+        escrow.createEscrow{value: 300}(jobId, freelancer, address(0), amounts);
+
+        escrow.releaseMilestone(jobId, 0);
+
+        (,,,, bool completed) = escrow.agreements(jobId);
+        require(completed == false, "Agreement must not be complete with an outstanding milestone");
+    }
+
+    function testAgreementCompletedAfterLastMilestone() public {
+        uint256[] memory amounts = _twoMilestones();
+        escrow.createEscrow{value: 300}(jobId, freelancer, address(0), amounts);
+
+        escrow.releaseMilestone(jobId, 0);
+        escrow.releaseMilestone(jobId, 1);
+
+        (,,,, bool completed) = escrow.agreements(jobId);
+        require(completed == true, "Agreement must be complete after the last milestone");
+        require(address(escrow).balance == 0, "Escrow must be fully drained");
+    }
+
+    function testPartialReleaseDoesNotSetCompleted() public {
+        uint256[] memory amounts = new uint256[](3);
+        amounts[0] = 100;
+        amounts[1] = 100;
+        amounts[2] = 100;
+        escrow.createEscrow{value: 300}(jobId, freelancer, address(0), amounts);
+
+        escrow.releaseMilestone(jobId, 0);
+        escrow.releaseMilestone(jobId, 2);
+
+        (,,,, bool completed) = escrow.agreements(jobId);
+        require(completed == false, "Partial release must not complete the agreement");
+    }
+
+    function testRevertedReleaseDoesNotSetCompletedOrReleased() public {
+        TransferFailsERC20 token = new TransferFailsERC20();
+        token.mint(address(this), 100);
+        token.approve(address(escrow), 100);
+
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 100;
+        escrow.createEscrow(jobId, freelancer, address(token), amounts);
+
+        vm.expectRevert("Escrow: ERC20 transfer failed");
+        escrow.releaseMilestone(jobId, 0);
+
+        (,,,, bool completed) = escrow.agreements(jobId);
+        (, bool released) = escrow.agreementMilestones(jobId, 0);
+        require(released == false, "Failed release must not mark the milestone released");
+        require(completed == false, "Failed release must not complete the agreement");
+    }
+
+    function testCreateEscrowRevertsWhenEthSentForTokenEscrow() public {
+        MockERC20 token = new MockERC20();
+        token.mint(address(this), 300);
+        token.approve(address(escrow), 300);
+
+        uint256[] memory amounts = _twoMilestones();
+
+        vm.expectRevert("Escrow: ETH not accepted for token escrow");
+        escrow.createEscrow{value: 1}(jobId, freelancer, address(token), amounts);
+    }
 }

@@ -20,27 +20,39 @@ Tests live in `contracts/test/`. They are intentionally **dependency-free** — 
 | Contract | Purpose | Tested |
 | --- | --- | --- |
 | `AIAgentRegistry.sol` | Onchain registry of autonomous threat telemetry + contract blacklist. | yes — 7 tests |
-| `ChainGuardRegistry.sol` | Risk scores, blacklisted drainers, trusted protocol attestations. | yes — 1 test (happy path) |
+| `ChainGuardRegistry.sol` | Risk scores, blacklisted drainers, trusted protocol attestations. | yes — 12 tests |
 | `CryptoPayroll.sol` | Batch corporate salary disbursal in one transaction. | yes — 7 tests |
-| `FreelancerEscrow.sol` | Milestone-based fund locking with client-approved release. | yes — 11 tests |
-| `GitHubBounty.sol` | USDC bounties locked to GitHub PR merges. | yes — 1 test (happy path) |
-| `OnchainCreditScore.sol` | Verifiable credit ratings + loan collateral discounts. | yes — 1 test (happy path) |
-| `RecurringBilling.sol` | Onchain subscription allowances and merchant pulls. | yes — 1 test (happy path) |
-| `UniversalCheckout.sol` | Multi-token payment routing + merchant stablecoin settlement. | yes — 8 tests |
+| `FreelancerEscrow.sol` | Milestone-based fund locking with client-approved release. | yes — 16 tests |
+| `GitHubBounty.sol` | USDC bounties locked to GitHub PR merges. | yes — 8 tests |
+| `OnchainCreditScore.sol` | Verifiable credit ratings + loan collateral discounts. | yes — 8 tests |
+| `RecurringBilling.sol` | Onchain subscription allowances and merchant pulls. | yes — 14 tests |
+| `UniversalCheckout.sol` | Multi-token payment routing + merchant stablecoin settlement. | yes — 17 tests |
 
 ## Measured counts
 
 ```
-Ran 8 test suites: 37 tests passed, 0 failed, 0 skipped (37 total tests)
+Ran 8 test suites: 89 tests passed, 0 failed, 0 skipped (89 total tests)
 ```
 
 Baseline before the `FreelancerEscrow` / `AIAgentRegistry` work: **6 tests**.
+Before the fee / completion / billing / access-control work: **37 tests**.
 
 ## Known uncovered behaviour (honest gaps)
 
-- `ChainGuardRegistry`, `GitHubBounty`, `OnchainCreditScore`, `RecurringBilling`
-  only have happy-path tests — no revert/access-control/event assertions.
-- `FreelancerEscrow.isCompleted` is never set by any code path (dead field).
-- `UniversalCheckout.feeBps` is declared but never applied to a payout.
-- `RecurringBilling.processBilling` moves no funds — it only advances a timestamp.
 - No reentrancy tests exist for any contract.
+- `UniversalCheckout` does not follow checks-effects-interactions: `merchants[...]
+  .totalVolumeUsd` is updated *after* the token/ETH external call and
+  `PaymentProcessed` is emitted after it too (forge flags `reentrancy-no-eth`
+  and `reentrancy-events`). The fee split itself is exact, but the accounting
+  should be moved before the transfer.
+- `GitHubBounty` and `OnchainCreditScore` never move funds: a bounty reward and
+  a credit credential are stored metadata only. There is no token escrow or
+  payout path in either contract.
+- `ChainGuardRegistry.setGuardian` accepts `address(0)` as a guardian (the
+  deployer is still a guardian, so this is only an unguarded-input smell, not an
+  escalation).
+- `RecurringBilling` has no on-chain way for the subscriber to bound the number
+  of pulls; the merchant's allowance is the only limit. It also has no
+  `SubscriptionUpdated` path — a subscription must be cancelled and recreated.
+- `FreelancerEscrow` has no freelancer-acceptance step and no dispute window;
+  the client alone controls release.

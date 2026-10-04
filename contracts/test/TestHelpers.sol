@@ -6,6 +6,8 @@ interface Vm {
     function prank(address) external;
     function expectRevert(bytes calldata) external;
     function expectEmit(bool, bool, bool, bool) external;
+    function warp(uint256) external;
+    function getBlockTimestamp() external view returns (uint256);
 }
 
 /// @dev Well-behaved ERC20: returns true and tracks balances/allowances.
