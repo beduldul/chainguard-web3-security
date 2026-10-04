@@ -1,5 +1,10 @@
 # ChainGuard — Web3 Security & Decentralized Commerce
 
+[![Contracts CI](https://github.com/beduldul/chainguard-web3-security/actions/workflows/contracts.yml/badge.svg)](https://github.com/beduldul/chainguard-web3-security/actions/workflows/contracts.yml)
+[![CI](https://github.com/beduldul/chainguard-web3-security/actions/workflows/ci.yml/badge.svg)](https://github.com/beduldul/chainguard-web3-security/actions/workflows/ci.yml)
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+
 > Intercepts, simulates, and audits EVM & Solana transactions before wallet signatures.
 > Also ships a set of onchain commerce contracts built on Base, Solana, and Ethereum.
 
