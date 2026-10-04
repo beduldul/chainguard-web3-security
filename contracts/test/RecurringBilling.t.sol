@@ -16,6 +16,7 @@ contract RecurringBillingTest {
     event SubscriptionCreated(bytes32 indexed subId, address indexed subscriber, address indexed merchant, uint256 amountUsdc);
     event SubscriptionBilled(bytes32 indexed subId, uint256 timestamp);
     event SubscriptionCancelled(bytes32 indexed subId);
+    event MaxPullsUpdated(bytes32 indexed subId, uint256 maxPulls);
 
     function setUp() public {
         billing = new RecurringBilling();
@@ -29,7 +30,7 @@ contract RecurringBillingTest {
         emit SubscriptionCreated(subId, address(this), merchant, 29990000);
         billing.createSubscription(subId, merchant, address(token), 29990000, 30 days);
 
-        (address sub, address mer, address tok, uint256 amt, uint256 interval, , bool active) =
+        (address sub, address mer, address tok, uint256 amt, uint256 interval, , bool active, , ) =
             billing.subscriptions(subId);
 
         require(sub == address(this), "Subscriber mismatch");
@@ -73,7 +74,7 @@ contract RecurringBillingTest {
         require(token.balanceOf(merchant) == 29990000, "Merchant not paid");
         require(token.balanceOf(address(this)) == 100_000_000 - 29990000, "Subscriber not debited");
 
-        (, , , , , uint256 lastBilledAt, ) = billing.subscriptions(subId);
+        (, , , , , uint256 lastBilledAt, , , ) = billing.subscriptions(subId);
         require(lastBilledAt == block.timestamp, "Timestamp not advanced");
     }
 
@@ -167,7 +168,7 @@ contract RecurringBillingTest {
         emit SubscriptionCancelled(subId);
         billing.cancelSubscription(subId);
 
-        (, , , , , , bool active) = billing.subscriptions(subId);
+        (, , , , , , bool active, , ) = billing.subscriptions(subId);
         require(active == false, "Subscription still active");
     }
 
@@ -178,7 +179,95 @@ contract RecurringBillingTest {
         vm.expectRevert("RecurringBilling: caller is not subscriber");
         billing.cancelSubscription(subId);
 
-        (, , , , , , bool active) = billing.subscriptions(subId);
+        (, , , , , , bool active, , ) = billing.subscriptions(subId);
         require(active == true, "Unauthorized cancel must not persist");
+    }
+
+    function testSetMaxPullsUpdatesAndEmits() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+
+        vm.expectEmit(true, false, false, true);
+        emit MaxPullsUpdated(subId, 3);
+        billing.setMaxPulls(subId, 3);
+
+        (, , , , , , , uint256 maxPulls, ) = billing.subscriptions(subId);
+        require(maxPulls == 3, "Max pulls not set");
+    }
+
+    function testSetMaxPullsRevertsForNonSubscriber() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+
+        vm.prank(stranger);
+        vm.expectRevert("RecurringBilling: caller is not subscriber");
+        billing.setMaxPulls(subId, 3);
+    }
+
+    function testProcessBillingRevertsAtMaxPullsBoundary() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+        billing.setMaxPulls(subId, 2);
+
+        vm.warp(vm.getBlockTimestamp() + 30 days);
+        billing.processBilling(subId);
+        vm.warp(vm.getBlockTimestamp() + 30 days);
+        billing.processBilling(subId);
+
+        vm.warp(vm.getBlockTimestamp() + 30 days);
+        vm.expectRevert("RecurringBilling: max pulls reached");
+        billing.processBilling(subId);
+
+        require(token.balanceOf(merchant) == 200, "Merchant must be paid exactly maxPulls times");
+    }
+
+    function testProcessBillingUnlimitedWhenMaxPullsZero() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+
+        for (uint256 i = 0; i < 3; i++) {
+            vm.warp(vm.getBlockTimestamp() + 30 days);
+            billing.processBilling(subId);
+        }
+
+        require(token.balanceOf(merchant) == 300, "Unlimited subscription must bill every interval");
+    }
+
+    function testSetMaxPullsRevertsBelowPullsMade() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+
+        vm.warp(vm.getBlockTimestamp() + 30 days);
+        billing.processBilling(subId);
+        vm.warp(vm.getBlockTimestamp() + 30 days);
+        billing.processBilling(subId);
+
+        vm.expectRevert("RecurringBilling: max pulls below pulls made");
+        billing.setMaxPulls(subId, 1);
+    }
+
+    function testMaxPullsCanBeRaisedAfterPullsMade() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+        billing.setMaxPulls(subId, 1);
+
+        vm.warp(vm.getBlockTimestamp() + 30 days);
+        billing.processBilling(subId);
+
+        billing.setMaxPulls(subId, 5);
+
+        vm.warp(vm.getBlockTimestamp() + 30 days);
+        billing.processBilling(subId);
+
+        require(token.balanceOf(merchant) == 200, "Raised cap must allow further pulls");
+    }
+
+    function testSetMaxPullsToZeroRestoresUnlimited() public {
+        billing.createSubscription(subId, merchant, address(token), 100, 30 days);
+        billing.setMaxPulls(subId, 1);
+
+        vm.warp(vm.getBlockTimestamp() + 30 days);
+        billing.processBilling(subId);
+
+        billing.setMaxPulls(subId, 0);
+
+        vm.warp(vm.getBlockTimestamp() + 30 days);
+        billing.processBilling(subId);
+
+        require(token.balanceOf(merchant) == 200, "Zero cap must restore unlimited pulls");
     }
 }

@@ -22,6 +22,8 @@ contract RecurringBilling {
         uint256 intervalSeconds;
         uint256 lastBilledAt;
         bool isActive;
+        uint256 maxPulls; // 0 = unlimited; subscriber-settable cap on merchant pulls
+        uint256 pullsCount; // number of successful billing pulls so far
     }
 
     mapping(bytes32 => Subscription) public subscriptions;
@@ -29,6 +31,7 @@ contract RecurringBilling {
     event SubscriptionCreated(bytes32 indexed subId, address indexed subscriber, address indexed merchant, uint256 amountUsdc);
     event SubscriptionBilled(bytes32 indexed subId, uint256 timestamp);
     event SubscriptionCancelled(bytes32 indexed subId);
+    event MaxPullsUpdated(bytes32 indexed subId, uint256 maxPulls);
 
     // Hand-rolled reentrancy guard (no forge-std / OZ dependency). 1 = unlocked, 2 = entered.
     uint256 private _reentrancyStatus = 1;
@@ -59,7 +62,9 @@ contract RecurringBilling {
             amountUsdc: amountUsdc,
             intervalSeconds: intervalSeconds,
             lastBilledAt: block.timestamp,
-            isActive: true
+            isActive: true,
+            maxPulls: 0,
+            pullsCount: 0
         });
 
         emit SubscriptionCreated(subId, msg.sender, merchant, amountUsdc);
@@ -69,14 +74,31 @@ contract RecurringBilling {
         Subscription storage sub = subscriptions[subId];
         require(sub.isActive, "RecurringBilling: subscription is not active");
         require(block.timestamp >= sub.lastBilledAt + sub.intervalSeconds, "RecurringBilling: interval has not elapsed");
+        require(sub.maxPulls == 0 || sub.pullsCount < sub.maxPulls, "RecurringBilling: max pulls reached");
 
         // Effects before interactions: advancing the timestamp first means a re-entrant
         // caller would hit "interval has not elapsed" rather than double-billing the period.
         sub.lastBilledAt = block.timestamp;
+        sub.pullsCount += 1;
 
         emit SubscriptionBilled(subId, block.timestamp);
 
         _safeTransferFrom(sub.token, sub.subscriber, sub.merchant, sub.amountUsdc);
+    }
+
+    /**
+     * @dev Sets the subscriber's cap on the number of billing pulls. `0` means unlimited.
+     * Only the subscriber may set it, and it can never be lowered below the number of
+     * pulls already made.
+     */
+    function setMaxPulls(bytes32 subId, uint256 maxPulls) external {
+        Subscription storage sub = subscriptions[subId];
+        require(sub.subscriber == msg.sender, "RecurringBilling: caller is not subscriber");
+        require(maxPulls == 0 || maxPulls >= sub.pullsCount, "RecurringBilling: max pulls below pulls made");
+
+        sub.maxPulls = maxPulls;
+
+        emit MaxPullsUpdated(subId, maxPulls);
     }
 
     function cancelSubscription(bytes32 subId) external {

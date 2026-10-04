@@ -60,6 +60,13 @@ contract ChainGuardRegistryTest {
         require(registry.guardians(guardian) == false, "Guardian not revoked");
     }
 
+    function testSetGuardianRevertsForZeroAddress() public {
+        vm.expectRevert("ChainGuard: invalid guardian");
+        registry.setGuardian(address(0), true);
+
+        require(registry.guardians(address(0)) == false, "Zero address must not become guardian");
+    }
+
     function testSetGuardianRevertsForNonOwner() public {
         vm.prank(stranger);
         vm.expectRevert("ChainGuard: caller is not owner");

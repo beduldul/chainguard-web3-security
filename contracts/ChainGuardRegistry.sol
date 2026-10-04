@@ -48,6 +48,7 @@ contract ChainGuardRegistry {
     }
 
     function setGuardian(address guardian, bool status) external onlyOwner {
+        require(guardian != address(0), "ChainGuard: invalid guardian");
         guardians[guardian] = status;
         emit GuardianUpdated(guardian, status);
     }

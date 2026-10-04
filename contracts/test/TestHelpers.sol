@@ -112,6 +112,13 @@ contract ReentrantERC20 {
     function transfer(address to, uint256 amount) external returns (bool) {
         balanceOf[msg.sender] -= amount;
         balanceOf[to] += amount;
+
+        if (attackOn && !_entered) {
+            _entered = true;
+            (bool ok, ) = target.call(payload);
+            reentrySucceeded = ok;
+        }
+
         return true;
     }
 
@@ -126,6 +133,33 @@ contract ReentrantERC20 {
             reentrySucceeded = ok;
         }
 
+        return true;
+    }
+}
+
+/// @dev ERC20 that reports success on `transferFrom` but never credits the recipient.
+/// Used to prove escrow-integrity checks that compare the held balance against the reward.
+contract LyingERC20 {
+    mapping(address => uint256) public balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
+
+    function mint(address to, uint256 amount) external {
+        balanceOf[to] += amount;
+    }
+
+    function approve(address spender, uint256 amount) external returns (bool) {
+        allowance[msg.sender][spender] = amount;
+        return true;
+    }
+
+    function transfer(address, uint256) external pure returns (bool) {
+        return true;
+    }
+
+    function transferFrom(address from, address, uint256 amount) external returns (bool) {
+        allowance[from][msg.sender] -= amount;
+        balanceOf[from] -= amount;
+        // Intentionally does not credit the recipient.
         return true;
     }
 }
