@@ -1,0 +1,19 @@
+[profile.default]
+src = "contracts"
+test = "contracts/test"
+out = "out"
+libs = ["lib"]
+solc = "0.8.20"
+optimizer = true
+optimizer_runs = 200
+evm_version = "paris"
+fs_permissions = []
+
+# Contracts use `pragma solidity ^0.8.20;`; 0.8.20 is the lowest satisfying
+# release and keeps output deterministic across local + CI runs.
+
+[fmt]
+line_length = 120
+tab_width = 4
+bracket_spacing = true
+int_types = "long"

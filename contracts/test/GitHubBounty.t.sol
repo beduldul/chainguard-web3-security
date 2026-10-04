@@ -5,7 +5,7 @@ import "../GitHubBounty.sol";
 
 contract GitHubBountyTest {
     GitHubBounty public bountyContract;
-    address public solver = address(0x3a4b9c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b);
+    address public solver = address(0x3A4b9c1D2E3F4A5b6C7d8e9F0a1b2C3D4e5F6a7b);
 
     function setUp() public {
         bountyContract = new GitHubBounty();

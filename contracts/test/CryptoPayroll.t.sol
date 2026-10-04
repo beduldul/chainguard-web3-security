@@ -6,7 +6,7 @@ import "../CryptoPayroll.sol";
 contract CryptoPayrollTest {
     CryptoPayroll public payroll;
     address public emp1 = address(0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045);
-    address public emp2 = address(0x3a4b9c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b);
+    address public emp2 = address(0x3A4b9c1D2E3F4A5b6C7d8e9F0a1b2C3D4e5F6a7b);
 
     function setUp() public {
         payroll = new CryptoPayroll();

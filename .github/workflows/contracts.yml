@@ -1,0 +1,36 @@
+name: Solidity Contracts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "contracts/**"
+      - "foundry.toml"
+      - ".github/workflows/contracts.yml"
+  pull_request:
+    paths:
+      - "contracts/**"
+      - "foundry.toml"
+      - ".github/workflows/contracts.yml"
+  workflow_dispatch:
+
+jobs:
+  forge-test:
+    name: forge build + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Show forge version
+        run: forge --version
+
+      - name: Build contracts
+        run: forge build
+
+      - name: Run Foundry tests
+        run: forge test -vv
